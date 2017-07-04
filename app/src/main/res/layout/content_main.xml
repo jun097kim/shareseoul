@@ -8,4 +8,9 @@
     tools:context="kr.or.hanium.mojjak.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <RelativeLayout
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </android.support.constraint.ConstraintLayout>
