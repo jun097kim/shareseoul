@@ -8,7 +8,7 @@
     tools:context="kr.or.hanium.mojjak.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <RelativeLayout
+    <net.daum.mf.map.api.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
