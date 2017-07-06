@@ -68,15 +68,18 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_search) {
             Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
+            overridePendingTransition(0, 0);    // 애니메이션 없애기
+        } else if (id == R.id.nav_route) {
             Intent intent = new Intent(this, RouteActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_slideshow) {
+            overridePendingTransition(0, 0);    // 애니메이션 없애기
+        } else if (id == R.id.nav_train) {
             Intent intent = new Intent(this, SubwayActivity.class);
             startActivity(intent);
+            overridePendingTransition(0, 0);    // 애니메이션 없애기
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

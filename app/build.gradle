@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true    // 벡터 이미지 사용
     }
     buildTypes {
         release {
@@ -28,5 +29,5 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
-    compile files('libs/libDaumMapAndroid.jar')
+    compile files('libs/libDaumMapAndroid.jar') // Daum 지도 API SDK
 }

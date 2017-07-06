@@ -16,6 +16,8 @@ public class RouteActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);      // 툴바 Up 버튼 추가
+        getSupportActionBar().setDisplayShowTitleEnabled(false);    // 툴바 타이틀 없애기
     }
 
 }
