@@ -18,8 +18,6 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MapView.MapViewEventListener, MapView.CurrentLocationEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener {
 
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mMapView = (MapView) findViewById(R.id.map_view);
-        mMapView.setDaumMapApiKey("66e8736e5373ddb171fa2fa987658d93");
+        mMapView.setDaumMapApiKey(ApiConst.DAUM_MAPS_API_KEY);
         mMapView.setCurrentLocationEventListener(this);
         mMapView.setMapViewEventListener(this);
     }
@@ -73,18 +71,23 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // 검색 메뉴를 눌렀을 때, SearchActivity 호출
         if (id == R.id.nav_search) {
             Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
-            overridePendingTransition(0, 0);    // 애니메이션 없애기
-        } else if (id == R.id.nav_route) {
+            overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+        }
+        // 길찾기 메뉴를 눌렀을 때, RouteActivity 호출
+        else if (id == R.id.nav_route) {
             Intent intent = new Intent(this, RouteActivity.class);
             startActivity(intent);
-            overridePendingTransition(0, 0);    // 애니메이션 없애기
-        } else if (id == R.id.nav_train) {
+            overridePendingTransition(0, 0);
+        }
+        // 지하철 노선도 메뉴를 눌렀을 때, SubwayActivity 호출
+        else if (id == R.id.nav_train) {
             Intent intent = new Intent(this, SubwayActivity.class);
             startActivity(intent);
-            overridePendingTransition(0, 0);    // 애니메이션 없애기
+            overridePendingTransition(0, 0);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -93,17 +96,22 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    // 다음 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수
+    // 다음 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
 
+    // 맵 이동이 완료됐을 때, 한 번만 호출
     @Override
     public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint) {
-        mReverseGeoCoder = new MapReverseGeoCoder("66e8736e5373ddb171fa2fa987658d93", mMapView.getMapCenterPoint(), this, this);
+        mReverseGeoCoder = new MapReverseGeoCoder(ApiConst.DAUM_MAPS_API_KEY, mMapView.getMapCenterPoint(), this, this);
         mReverseGeoCoder.startFindingAddress();
     }
 
+    // 좌표에서 주소로 변환이 완료되면 호출
     @Override
     public void onReverseGeoCoderFoundAddress(MapReverseGeoCoder mapReverseGeoCoder, String s) {
         TextView textView = (TextView) findViewById(R.id.reverse_geocoding);
+        if (s.equals("null")) {
+            s = "주소를 확인할 수 없습니다.";
+        }
         textView.setText(s);
     }
 
@@ -112,6 +120,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // 맵 이동 시작부터 멈춤까지 계속 호출
     @Override
     public void onMapViewCenterPointMoved(MapView mapView, MapPoint mapPoint) {
 
