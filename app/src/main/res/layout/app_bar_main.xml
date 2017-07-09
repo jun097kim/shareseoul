@@ -29,31 +29,22 @@
 
     <!-- Bottom Sheet -->
     <LinearLayout
-        android:id="@+id/bottomSheet"
+        android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="220dp"
         android:background="#FFFFFF"
         android:orientation="vertical"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="64dp"
+        app:behavior_peekHeight="60dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <TextView
-            android:id="@+id/reverse_geocoding"
+            android:id="@+id/reverse_geocoded"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:text="종각역 1호선"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="종구 의주로2가"
             android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="서울특별시 종로구 종로1가 44"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <View
             android:layout_width="fill_parent"
@@ -134,10 +125,11 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_fab_wc"
         android:tint="@color/colorPrimary"
-        />
+        app:layout_anchor="@id/bottom_sheet"
+        app:layout_anchorGravity="top|end"
+        app:srcCompat="@drawable/ic_fab_wc"
+        app:useCompatPadding="true" />
+    <!-- useCompatPadding: 다른 API 버전 간에 padding 일관성 유지 -->
 
 </android.support.design.widget.CoordinatorLayout>

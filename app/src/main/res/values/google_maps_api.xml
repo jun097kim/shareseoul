@@ -1,0 +1,6 @@
+<resources>
+    <!--
+    구글 지도 API 키
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDxkEF1U7DlPTiL3zp3qFEkYYlFbmxD5MU</string>
+</resources>
