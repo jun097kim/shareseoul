@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
         placeAPIService = retrofit.create(PlaceAPIService.class);
-
     }
 
     @Override
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         LatLng target = mMap.getCameraPosition().target;
-        placeAPIService.getSuccess("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
+        placeAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
             @Override
             public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {
                 if (response.code() == 200) {   // request.code(): HTTP 상태 코드

@@ -8,12 +8,12 @@ public interface PlaceAPIService {
     String API_URL = "https://apis.daum.net/local/v1/search/"; // public static final 생략
 
     @GET("keyword.json")
-    Call<PlaceAPIResponse> getSuccess(@Query("apikey")
+    Call<PlaceAPIResponse> getPlaces(@Query("apikey")
                                            String apikey,
-                                      @Query("query")
+                                     @Query("query")
                                            String query,
-                                      @Query("location")
+                                     @Query("location")
                                            String location,
-                                      @Query("radius")
+                                     @Query("radius")
                                            int radius);
 }

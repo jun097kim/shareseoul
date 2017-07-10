@@ -14,29 +14,51 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorAccent">
+        android:background="@color/colorPrimary">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            <ImageButton
+                android:id="@+id/swap_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@null"
+                app:srcCompat="@drawable/ic_button_swap" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="출발지 검색" />
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="목적지 검색" />
+                <EditText
+                    android:id="@+id/origin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="출발지 검색"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1" />
 
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/destination"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="목적지 검색"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+                <Button
+                    android:id="@+id/search_route_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="검색" />
+
+            </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
 
