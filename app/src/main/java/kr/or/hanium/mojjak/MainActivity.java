@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         // 검색 메뉴를 눌렀을 때, SearchActivity 호출
         if (id == R.id.nav_search) {
             Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("searchType", "normal");
             startActivity(intent);
             overridePendingTransition(0, 0);// 전환 애니메이션 없애기
         }
@@ -189,6 +190,7 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.search_btn:
                 Intent intent = new Intent(this, SearchActivity.class);
+                intent.putExtra("searchType", "normal");
                 startActivity(intent);
 
                 overridePendingTransition(0, 0);    // 전환 애니메이션 없애기

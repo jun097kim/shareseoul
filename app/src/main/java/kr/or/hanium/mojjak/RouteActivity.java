@@ -68,9 +68,11 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
         switch (v.getId()) {
             case R.id.origin:
+                intent.putExtra("searchType","origin");
                 startActivity(intent);
                 break;
             case R.id.destination:
+                intent.putExtra("searchType","destination");
                 startActivity(intent);
                 break;
             case R.id.search_route_btn:

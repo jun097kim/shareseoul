@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/editTextBackground"
                     android:maxLines="1"
-                    android:text="목적지 검색"
+                    android:text="도착지 검색"
                     android:textAppearance="?android:attr/textAppearanceMediumInverse"
                     android:textColor="?attr/editTextColor" />
 
