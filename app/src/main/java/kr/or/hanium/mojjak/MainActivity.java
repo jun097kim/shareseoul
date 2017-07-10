@@ -16,10 +16,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -51,7 +47,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        TextView searchBtn = (TextView) findViewById(R.id.search_btn);
+
         fab.setOnClickListener(this);
+        searchBtn.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,8 +94,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_search) {
             Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
-
-            overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+            overridePendingTransition(0, 0);// 전환 애니메이션 없애기
         }
         // 길찾기 메뉴를 눌렀을 때, RouteActivity 호출
         else if (id == R.id.nav_route) {
@@ -156,31 +154,46 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    // FAB를 눌렀을 때
     @Override
     public void onClick(View v) {
-        LatLng target = mMap.getCameraPosition().target;
-        placeAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
-            @Override
-            public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {
-                if (response.code() == 200) {   // request.code(): HTTP 상태 코드
-                    for (Item item : response.body().getChannel().getItem()) {
-                        String title = item.getTitle();
-                        Double latitude = Double.parseDouble(item.getLatitude());
-                        Double longitude = Double.parseDouble(item.getLongitude());
+        switch (v.getId()) {
 
-                        LatLng wc = new LatLng(latitude, longitude);                     // 화장실 좌표
-                        mMap.addMarker(new MarkerOptions().position(wc).title(title));   // 화장실 마커 추가
+            case R.id.fab:
+                LatLng target = mMap.getCameraPosition().target;
+
+                placeAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
+
+                    @Override
+                    public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {
+                        if (response.code() == 200) {   // request.code(): HTTP 상태 코드
+                            for (Item item : response.body().getChannel().getItem()) {
+                                String title = item.getTitle();
+                                Double latitude = Double.parseDouble(item.getLatitude());
+                                Double longitude = Double.parseDouble(item.getLongitude());
+
+                                LatLng wc = new LatLng(latitude, longitude);                     // 화장실 좌표
+                                mMap.addMarker(new MarkerOptions().position(wc).title(title));   // 화장실 마커 추가
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, "API 트래픽이 초과되었습니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Toast.makeText(MainActivity.this, "API 트래픽이 초과되었습니다.", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<PlaceAPIResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<PlaceAPIResponse> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                break;
+
+            case R.id.search_btn:
+                Intent intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+
+                overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
+                break;
+        }
     }
 }

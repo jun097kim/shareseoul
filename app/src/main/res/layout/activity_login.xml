@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary" />
-        <!-- ?attr: 현재 적용된 테마(AppTheme)의 속성 -->
+        <!-- ?attr: 현재 적용된 테마(AppTheme.NoActionBar)의 속성 -->
 
     </android.support.design.widget.AppBarLayout>
 

@@ -1,5 +1,6 @@
 package kr.or.hanium.mojjak;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -25,6 +27,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
     private RecyclerView routeRecyclerView;
     private ArrayList<Album> albumList = new ArrayList<>();
     private RecyclerAdapter recyclerAdapter;
+    private TextView origin;
+    private TextView destination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +42,13 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
         Button searchRouteBtn = (Button) findViewById(R.id.search_route_btn);
         ImageButton swapBtn = (ImageButton) findViewById(R.id.swap_btn);
+        origin = (TextView) findViewById(R.id.origin);
+        destination = (TextView) findViewById(R.id.destination);
 
         searchRouteBtn.setOnClickListener(this);
         swapBtn.setOnClickListener(this);
+        origin.setOnClickListener(this);
+        destination.setOnClickListener(this);
 
         // 구글 길찾기 API
         Retrofit retrofit = new Retrofit.Builder()
@@ -56,10 +64,15 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        EditText origin = (EditText) findViewById(R.id.origin);
-        EditText destination = (EditText) findViewById(R.id.destination);
+        Intent intent = new Intent(this, SearchActivity.class);
 
         switch (v.getId()) {
+            case R.id.origin:
+                startActivity(intent);
+                break;
+            case R.id.destination:
+                startActivity(intent);
+                break;
             case R.id.search_route_btn:
                 int size = albumList.size();
                 albumList.clear();

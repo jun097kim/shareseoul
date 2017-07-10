@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="kr.or.hanium.mojjak.RouteActivity">
     <!--
     activity_route.xml(RouteActivity.java)
@@ -34,23 +35,25 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <EditText
+                <TextView
                     android:id="@+id/origin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="출발지 검색"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1" />
+                    android:background="?attr/editTextBackground"
+                    android:maxLines="1"
+                    android:text="출발지 검색"
+                    android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                    android:textColor="?attr/editTextColor" />
 
-                <EditText
+                <TextView
                     android:id="@+id/destination"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="목적지 검색"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1" />
+                    android:background="?attr/editTextBackground"
+                    android:maxLines="1"
+                    android:text="목적지 검색"
+                    android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                    android:textColor="?attr/editTextColor" />
 
                 <Button
                     android:id="@+id/search_route_btn"

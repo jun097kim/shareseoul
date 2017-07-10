@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.or.hanium.mojjak">
 
-    <!--     구글 지도 API 퍼미션 -->
+    <!-- 구글 지도 API 퍼미션 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -41,8 +41,8 @@
             android:label="@string/title_activity_route"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="kr.or.hanium.mojjak.MainActivity" />
@@ -64,7 +64,6 @@
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".subActivity"></activity>
     </application>
 
 </manifest>

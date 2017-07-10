@@ -14,12 +14,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
+            android:background="@color/colorPrimary">
 
             <TextView
+                android:id="@+id/search_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="장소, 버스, 지하철..." />
+                android:hint="장소, 버스, 지하철 검색"
+                android:textSize="16sp" />
 
         </android.support.v7.widget.Toolbar>
 
@@ -27,109 +29,134 @@
 
     <include layout="@layout/content_main" />
 
-    <!-- Bottom Sheet -->
-    <LinearLayout
-        android:id="@+id/bottom_sheet"
+    <!--
+    Bottom Sheet
+    ScrollView: 터치 이벤트를 가로채는 영역
+    -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:background="#FFFFFF"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_shadow_top"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="60dp"
+        app:behavior_peekHeight="75dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <TextView
-            android:id="@+id/reverse_geocoded"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:text="종구 의주로2가"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/dividerVertical" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:text="화장실 평점"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="평균 3점"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-                <RatingBar
-                    android:id="@+id/ratingBarf"
-                    style="?android:attr/ratingBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:numStars="5"
-                    android:stepSize="1.0" />
-            </LinearLayout>
-
-        </RelativeLayout>
+        <!-- behavior_peekHeight: 59dp + shape_shadow_top 길이 -->
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="지하철"
-                android:textColor="#F44336" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:background="@drawable/shape_shadow_top" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/bottom_sheet"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=" 화장실을 이용하셨나요? 화장실을 평가해주세요."
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:background="@android:color/white"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/reverse_geocoded"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="종구 의주로2가"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/dividerVertical" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="16dp"
+                        android:text="화장실 평점"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:text="평균 3점 "
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+                        <RatingBar
+                            android:id="@+id/average_rating"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:numStars="5"
+                            android:stepSize="1.0" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="지하철"
+                        android:textColor="#f44336" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" 화장실을 이용하셨나요? 화장실을 평가해주세요."
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
+
+                <RatingBar
+                    android:id="@+id/my_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:numStars="5"
+                    android:paddingBottom="16dp"
+                    android:stepSize="1.0" />
+
+            </LinearLayout>
         </LinearLayout>
-
-        <RatingBar
-            android:id="@+id/ratingBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:numStars="5"
-            android:stepSize="1.0" />
-
-    </LinearLayout>
+    </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/colorPrimary"
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
         app:srcCompat="@drawable/ic_fab_wc"
         app:useCompatPadding="true" />
-    <!-- useCompatPadding: 다른 API 버전 간에 padding 일관성 유지 -->
+    <!--
+    tint: 아이콘 색상
+    backgroundTint: 배경 색상
+    useCompatPadding: 다른 API 버전 간에 padding 일관성 유지
+    -->
 
 </android.support.design.widget.CoordinatorLayout>
