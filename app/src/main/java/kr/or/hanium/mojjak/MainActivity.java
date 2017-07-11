@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraIdleListener, View.OnClickListener {
 
     private GoogleMap mMap;
-    private PlaceAPIService placeAPIService;
+    private PlaceAPIService mPlaceAPIService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
                 .baseUrl(PlaceAPIService.API_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        placeAPIService = retrofit.create(PlaceAPIService.class);
+        mPlaceAPIService = retrofit.create(PlaceAPIService.class);
     }
 
     @Override
@@ -95,18 +95,21 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SearchActivity.class);
             intent.putExtra("searchType", "normal");
             startActivity(intent);
+
             overridePendingTransition(0, 0);// 전환 애니메이션 없애기
         }
         // 길찾기 메뉴를 눌렀을 때, RouteActivity 호출
         else if (id == R.id.nav_route) {
             Intent intent = new Intent(this, RouteActivity.class);
             startActivity(intent);
+
             overridePendingTransition(0, 0);
         }
         // 지하철 노선도 메뉴를 눌렀을 때, SubwayActivity 호출
         else if (id == R.id.nav_train) {
             Intent intent = new Intent(this, SubwayActivity.class);
             startActivity(intent);
+
             overridePendingTransition(0, 0);
         }
 
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.fab:
                 LatLng target = mMap.getCameraPosition().target;
 
-                placeAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
+                mPlaceAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
 
                     @Override
                     public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {

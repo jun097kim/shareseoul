@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="장소, 버스, 지하철 검색"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
         </android.support.v7.widget.Toolbar>
 
@@ -123,7 +123,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="지하철"
-                        android:textColor="#f44336" />
+                        android:textColor="@color/colorAccent" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -149,6 +149,9 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@color/colorAccent"
+        app:borderWidth="0dp"
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
         app:srcCompat="@drawable/ic_fab_wc"

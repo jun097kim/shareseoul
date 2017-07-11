@@ -1,5 +1,6 @@
 package kr.or.hanium.mojjak;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +13,8 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 public class SearchActivity extends AppCompatActivity {
+
+    String mSearchType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,15 +29,18 @@ public class SearchActivity extends AppCompatActivity {
 
 
         // 힌트 텍스트 설정
-        String searchType = getIntent().getExtras().getString("searchType");
-        String hint;
+        mSearchType = getIntent().getExtras().getString("searchType");
+        String hint = null;
 
-        if (searchType.equals("normal")) {
-            hint = "장소, 버스, 지하철 검색";
-        } else if (searchType.equals("origin")) {
-            hint = "출발지 검색";
-        } else {
-            hint = "도착지 검색";
+        switch (mSearchType) {
+            case "normal":
+                hint = "장소, 버스, 지하철 검색";
+                break;
+            case "origin":
+                hint = "출발지 검색";
+                break;
+            case "destination":
+                hint = "도착지 검색";
         }
 
         autocompleteFragment.setHint(hint);
@@ -48,10 +54,19 @@ public class SearchActivity extends AppCompatActivity {
         autocompleteFragment.setFilter(typeFilter);
 
 
+        // 검색 결과 아이템을 눌렀을 때 호출
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                Toast.makeText(SearchActivity.this, place.getName() + "\n" + place.getAddress(), Toast.LENGTH_SHORT).show();
+                if (mSearchType.equals("normal")) {
+                    Toast.makeText(SearchActivity.this, place.getName() + "\n" + place.getAddress(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent();
+                    intent.putExtra("result", place.getName());
+
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
 
             @Override
@@ -59,6 +74,17 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    // Back 버튼을 눌렀을 때 호출
+    @Override
+    public void onBackPressed() {
+        if (!mSearchType.equals("normal")) {
+            Intent intent = new Intent();
+            setResult(RESULT_CANCELED, intent);
+        }
+        super.onBackPressed();
     }
 
 }

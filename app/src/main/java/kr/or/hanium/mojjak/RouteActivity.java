@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -23,12 +22,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RouteActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private DirectionsAPIService directionsAPIService;
-    private RecyclerView routeRecyclerView;
-    private ArrayList<Album> albumList = new ArrayList<>();
-    private RecyclerAdapter recyclerAdapter;
-    private TextView origin;
-    private TextView destination;
+    private DirectionsAPIService mDirectionsAPIService;
+    private RecyclerView mRouteRecyclerView;
+    private ArrayList<Album> mAlbumList = new ArrayList<>();
+    private RecyclerAdapter mRecyclerAdapter;
+    private TextView mOrigin;
+    private TextView mDestination;
+
+    private static final int REQUEST_CODE_ORIGIN = 0;
+    private static final int REQUEST_CODE_DESTINATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,23 +44,23 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
         Button searchRouteBtn = (Button) findViewById(R.id.search_route_btn);
         ImageButton swapBtn = (ImageButton) findViewById(R.id.swap_btn);
-        origin = (TextView) findViewById(R.id.origin);
-        destination = (TextView) findViewById(R.id.destination);
+        mOrigin = (TextView) findViewById(R.id.origin);
+        mDestination = (TextView) findViewById(R.id.destination);
 
         searchRouteBtn.setOnClickListener(this);
         swapBtn.setOnClickListener(this);
-        origin.setOnClickListener(this);
-        destination.setOnClickListener(this);
+        mOrigin.setOnClickListener(this);
+        mDestination.setOnClickListener(this);
 
         // 구글 길찾기 API
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(DirectionsAPIService.API_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        directionsAPIService = retrofit.create(DirectionsAPIService.class);
+        mDirectionsAPIService = retrofit.create(DirectionsAPIService.class);
 
         initLayout();
-        recyclerAdapter = new RecyclerAdapter(albumList, R.layout.list_item);
+        mRecyclerAdapter = new RecyclerAdapter(mAlbumList, R.layout.list_item);
 
     }
 
@@ -67,20 +69,25 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(this, SearchActivity.class);
 
         switch (v.getId()) {
-            case R.id.origin:
-                intent.putExtra("searchType","origin");
-                startActivity(intent);
-                break;
-            case R.id.destination:
-                intent.putExtra("searchType","destination");
-                startActivity(intent);
-                break;
-            case R.id.search_route_btn:
-                int size = albumList.size();
-                albumList.clear();
-                recyclerAdapter.notifyItemRangeRemoved(0, size);
 
-                directionsAPIService.getDirections(origin.getText().toString(), destination.getText().toString(), "transit", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak", "ko").enqueue(new Callback<DirectionsAPIResponse>() {
+            case R.id.origin:
+                intent.putExtra("searchType", "origin");
+                startActivityForResult(intent, REQUEST_CODE_ORIGIN);
+                // startActivityForResult() : SearchActivity 종료 → 결과 받는 메소드 onActivityResult() 호출
+
+                break;
+
+            case R.id.destination:
+                intent.putExtra("searchType", "destination");
+                startActivityForResult(intent, REQUEST_CODE_DESTINATION);
+                break;
+
+            case R.id.search_route_btn:
+                int size = mAlbumList.size();
+                mAlbumList.clear();
+                mRecyclerAdapter.notifyItemRangeRemoved(0, size);
+
+                mDirectionsAPIService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak", "ko").enqueue(new Callback<DirectionsAPIResponse>() {
                     @Override
                     public void onResponse(Call<DirectionsAPIResponse> call, Response<DirectionsAPIResponse> response) {
                         for (Routes routes : response.body().getRoutes()) {
@@ -102,9 +109,9 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                                 }
                             }
                         }
-                        routeRecyclerView.setAdapter(recyclerAdapter);
-                        routeRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        routeRecyclerView.addItemDecoration(new DividerItemDecoration(RouteActivity.this, LinearLayoutManager.VERTICAL));  // 구분선
+                        mRouteRecyclerView.setAdapter(mRecyclerAdapter);
+                        mRouteRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        mRouteRecyclerView.addItemDecoration(new DividerItemDecoration(RouteActivity.this, LinearLayoutManager.VERTICAL));  // 구분선
                     }
 
                     @Override
@@ -115,9 +122,9 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.swap_btn:
-                String temp = origin.getText().toString();
-                origin.setText(destination.getText());
-                destination.setText(temp);
+                String temp = mOrigin.getText().toString();
+                mOrigin.setText(mDestination.getText());
+                mDestination.setText(temp);
 
                 break;
         }
@@ -126,7 +133,7 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void initLayout() {
-        routeRecyclerView = (RecyclerView) findViewById(R.id.route_recycler_view);
+        mRouteRecyclerView = (RecyclerView) findViewById(R.id.route_recycler_view);
     }
 
     // 데이터 초기화
@@ -135,6 +142,23 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         album.setTitle(a);
         album.setArtist(b);
         album.setDuration(duration);
-        albumList.add(album);
+        mAlbumList.add(album);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE_ORIGIN:
+                    mOrigin.setText(data.getStringExtra("result"));
+                    break;
+
+                case REQUEST_CODE_DESTINATION:
+                    mDestination.setText(data.getStringExtra("result"));
+            }
+        }
     }
 }
