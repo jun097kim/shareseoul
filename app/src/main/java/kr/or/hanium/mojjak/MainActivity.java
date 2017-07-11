@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,11 +47,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         TextView searchBtn = (TextView) findViewById(R.id.search_btn);
 
         fab.setOnClickListener(this);
         searchBtn.setOnClickListener(this);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -59,7 +62,12 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        RelativeLayout navLogin = (RelativeLayout) headerView.findViewById(R.id.nav_login);
+
         navigationView.setNavigationItemSelectedListener(this);
+        navLogin.setOnClickListener(this);
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -160,8 +168,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
+        Intent intent;
 
+        switch (v.getId()) {
             case R.id.fab:
                 LatLng target = mMap.getCameraPosition().target;
 
@@ -192,13 +201,19 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.search_btn:
-                Intent intent = new Intent(this, SearchActivity.class);
+                intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("searchType", "normal");
                 startActivity(intent);
 
                 overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
                 break;
+
+            case R.id.nav_login:
+                intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+
+                overridePendingTransition(0, 0);
         }
     }
 }
