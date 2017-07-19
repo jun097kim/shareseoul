@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,8 +23,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
     private DirectionsAPIService mDirectionsAPIService;
     private RecyclerView mRouteRecyclerView;
-    private ArrayList<Album> mAlbumList = new ArrayList<>();
-    private RecyclerAdapter mRecyclerAdapter;
+    private ArrayList<Route> mRouteList = new ArrayList<>();
+    private RouteAdapter mRouteAdapter;
     private TextView mOrigin;
     private TextView mDestination;
 
@@ -42,12 +41,10 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);      // 툴바 Up 버튼 추가
         getSupportActionBar().setDisplayShowTitleEnabled(false);    // 툴바 타이틀 없애기
 
-        Button searchRouteBtn = (Button) findViewById(R.id.search_route_btn);
         ImageButton swapBtn = (ImageButton) findViewById(R.id.swap_btn);
         mOrigin = (TextView) findViewById(R.id.origin);
         mDestination = (TextView) findViewById(R.id.destination);
 
-        searchRouteBtn.setOnClickListener(this);
         swapBtn.setOnClickListener(this);
         mOrigin.setOnClickListener(this);
         mDestination.setOnClickListener(this);
@@ -60,7 +57,7 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         mDirectionsAPIService = retrofit.create(DirectionsAPIService.class);
 
         initLayout();
-        mRecyclerAdapter = new RecyclerAdapter(mAlbumList, R.layout.list_item);
+        mRouteAdapter = new RouteAdapter(mRouteList, R.layout.route_list_item);
 
     }
 
@@ -82,45 +79,6 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                 startActivityForResult(intent, REQUEST_CODE_DESTINATION);
                 break;
 
-            case R.id.search_route_btn:
-                int size = mAlbumList.size();
-                mAlbumList.clear();
-                mRecyclerAdapter.notifyItemRangeRemoved(0, size);
-
-                mDirectionsAPIService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak", "ko").enqueue(new Callback<DirectionsAPIResponse>() {
-                    @Override
-                    public void onResponse(Call<DirectionsAPIResponse> call, Response<DirectionsAPIResponse> response) {
-                        for (Routes routes : response.body().getRoutes()) {
-                            for (Legs legs : routes.getLegs()) {
-                                for (Steps steps : legs.getSteps()) {
-                                    String duration = steps.getDuration().getText();
-
-                                    if (!(steps.getTransitDetails() == null)) {
-                                        String departureStop = steps.getTransitDetails().getDepartureStop().getName();
-                                        String arrivalStop = steps.getTransitDetails().getArrivalStop().getName();
-
-                                        initData(duration, departureStop, arrivalStop);
-                                    } else {
-                                        String walkingDistance = steps.getSteps().get(0).getDistance().getText();
-                                        String walkingDuration = steps.getSteps().get(0).getDuration().getText();
-
-                                        initData(duration, walkingDuration, walkingDistance);
-                                    }
-                                }
-                            }
-                        }
-                        mRouteRecyclerView.setAdapter(mRecyclerAdapter);
-                        mRouteRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        mRouteRecyclerView.addItemDecoration(new DividerItemDecoration(RouteActivity.this, LinearLayoutManager.VERTICAL));  // 구분선
-                    }
-
-                    @Override
-                    public void onFailure(Call<DirectionsAPIResponse> call, Throwable t) {
-
-                    }
-                });
-                break;
-
             case R.id.swap_btn:
                 String temp = mOrigin.getText().toString();
                 mOrigin.setText(mDestination.getText());
@@ -138,11 +96,11 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
     // 데이터 초기화
     private void initData(String duration, String a, String b) {
-        Album album = new Album();
-        album.setTitle(a);
-        album.setArtist(b);
-        album.setDuration(duration);
-        mAlbumList.add(album);
+        Route route = new Route();
+        route.setTitle(a);
+        route.setArtist(b);
+        route.setDuration(duration);
+        mRouteList.add(route);
     }
 
 
@@ -154,11 +112,56 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
             switch (requestCode) {
                 case REQUEST_CODE_ORIGIN:
                     mOrigin.setText(data.getStringExtra("result"));
+                    if (!mDestination.getText().equals("")) {
+                        showRouteList();
+                    }
                     break;
 
                 case REQUEST_CODE_DESTINATION:
                     mDestination.setText(data.getStringExtra("result"));
+                    if (!mOrigin.getText().equals("")) {
+                        showRouteList();
+                    }
             }
         }
+    }
+
+    private void showRouteList() {
+        int size = mRouteList.size();
+        mRouteList.clear();
+        mRouteAdapter.notifyItemRangeRemoved(0, size);
+
+        mDirectionsAPIService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak", "ko").enqueue(new Callback<DirectionsAPIResponse>() {
+            @Override
+            public void onResponse(Call<DirectionsAPIResponse> call, Response<DirectionsAPIResponse> response) {
+                for (Routes routes : response.body().getRoutes()) {
+                    for (Legs legs : routes.getLegs()) {
+                        for (Steps steps : legs.getSteps()) {
+                            String duration = steps.getDuration().getText();
+
+                            if (!(steps.getTransitDetails() == null)) {
+                                String departureStop = steps.getTransitDetails().getDepartureStop().getName();
+                                String arrivalStop = steps.getTransitDetails().getArrivalStop().getName();
+
+                                initData(duration, departureStop, arrivalStop);
+                            } else {
+                                String walkingDistance = steps.getSteps().get(0).getDistance().getText();
+                                String walkingDuration = steps.getSteps().get(0).getDuration().getText();
+
+                                initData(duration, walkingDuration, walkingDistance);
+                            }
+                        }
+                    }
+                }
+                mRouteRecyclerView.setAdapter(mRouteAdapter);
+                mRouteRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                mRouteRecyclerView.addItemDecoration(new DividerItemDecoration(RouteActivity.this, LinearLayoutManager.VERTICAL));  // 구분선
+            }
+
+            @Override
+            public void onFailure(Call<DirectionsAPIResponse> call, Throwable t) {
+
+            }
+        });
     }
 }

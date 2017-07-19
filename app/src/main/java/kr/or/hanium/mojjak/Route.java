@@ -1,6 +1,6 @@
 package kr.or.hanium.mojjak;
 
-public class Album {
+public class Route {
     private String title;
     private String artist;
     private String duration;
