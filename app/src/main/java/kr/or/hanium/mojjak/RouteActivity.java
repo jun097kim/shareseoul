@@ -139,7 +139,7 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                 ArrayList<Steps> steps = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
 
                 for (Steps s : steps) {
-                    switch (s.getTravelmode()) {
+                    switch (s.getTravelmode())  {
 
                         case "TRANSIT":
                             Log.i("route", "대중교통 경로");
