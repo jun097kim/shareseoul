@@ -138,24 +138,26 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
                 ArrayList<Steps> steps = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
 
+                Log.i("route", response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText());
                 for (Steps s : steps) {
                     switch (s.getTravelmode()) {
 
                         case "TRANSIT":
                             Log.i("route", "대중교통 경로");
-                            Log.i("route", "Distance: " + s.getDistance().getText());
-                            Log.i("route", "Duration" + s.getDuration().getText());
-                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions());
-TransitDetails transitDetails = s.getTransitDetails();
-                            Log.i("route","Arrival"+transitDetails.getArrivalStop().getName());
-                            Log.i("route","Departure"+transitDetails.getDepartureStop().getName());
+//                            Log.i("route", "Distance: " + s.getDistance().getText()); //거리
+//                            Log.i("route", "Duration" + s.getDuration().getText());   //시간
+//                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions()); // ~~까지 도보 / ~무슨 행
+                    TransitDetails transitDetails = s.getTransitDetails();
+                            Log.i("route","("+transitDetails.getArrivalStop().getName()+")");
+                            Log.i("route","> "+transitDetails.getDepartureStop().getName()+"하차");
+                            Log.i("route", "버스 "+transitDetails.getLine().getShort_name()+"탑승");
 
                             break;
                         case "WALKING":
-                            Log.i("route", "도보 경로");
-                            Log.i("route", "Distance: " + s.getDistance().getText());
-                            Log.i("route", "Duration" + s.getDuration().getText());
-                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions());
+//                            Log.i("route", "도보 경로");
+//                            Log.i("route", "Distance: " + s.getDistance().getText());
+                            Log.i("route", "\n도보 " + s.getDuration().getText());
+//                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions());
 
                             break;
                     }

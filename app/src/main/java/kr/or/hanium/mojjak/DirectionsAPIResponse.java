@@ -26,9 +26,15 @@ class Routes {
 }
 
 class Legs {
+    @SerializedName("duration")
+    @Expose
+    private Duration duration;
+
     @SerializedName("steps")
     @Expose
     private ArrayList<Steps> steps;
+
+    public Duration getDuration() {return duration;}
 
     public ArrayList<Steps> getSteps() {
         return steps;
@@ -97,6 +103,10 @@ class TransitDetails {
     @Expose
     private ArrivalStop arrivalStop;
 
+    @SerializedName("line")
+    @Expose
+    private Line line;
+
     public DepartureStop getDepartureStop() {
         return departureStop;
     }
@@ -104,6 +114,8 @@ class TransitDetails {
     public ArrivalStop getArrivalStop() {
         return arrivalStop;
     }
+
+    public Line getLine() {return line;}
 }
 
 class DepartureStop {
@@ -117,6 +129,14 @@ class DepartureStop {
 }
 
 class ArrivalStop extends DepartureStop {
+}
+
+class Line {
+    @SerializedName("short_name")
+    @Expose
+    private String short_name;
+
+    public String getShort_name() {return short_name;}
 }
 
 
