@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class PlaceAPIResponse {
+public class PlacesAPIResponse {
     @SerializedName("channel")
     @Expose
     private Channel channel = null;
