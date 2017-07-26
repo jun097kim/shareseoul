@@ -32,11 +32,11 @@ class Routes {
 }
 
 class Legs {
-    @SerializedName("duration")
+    @SerializedName("duration") // 총 시간
     @Expose
     private Duration duration;
 
-    @SerializedName("distance")
+    @SerializedName("distance") // 총 거리
     @Expose
     private Distance distance;
 

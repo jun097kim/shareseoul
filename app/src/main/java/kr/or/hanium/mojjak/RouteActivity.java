@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,9 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
     private static final int REQUEST_CODE_ORIGIN = 0;
     private static final int REQUEST_CODE_DESTINATION = 2;
+
+    private ArrayList<String> durationList = new ArrayList<>(); // 총 걸리는 시간
+    private ArrayList<Integer> walkingDurationList = new ArrayList<>(); // 총 도보 시간
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,8 +141,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call<DirectionsAPIResponse> call, Response<DirectionsAPIResponse> response) {
 
                 ArrayList<Steps> steps = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
+                Integer WalkingDuration = 0;
 
-                Log.i("route", response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText());
                 for (Steps s : steps) {
                     switch (s.getTravelmode()) {
 
@@ -147,20 +151,32 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 //                            Log.i("route", "Distance: " + s.getDistance().getText()); //거리
 //                            Log.i("route", "Duration" + s.getDuration().getText());   //시간
 //                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions()); // ~~까지 도보 / ~무슨 행
-                            Log.i("route","("+s.getTransitDetails().getArrivalStop().getName()+")");
-                            Log.i("route","> "+s.getTransitDetails().getDepartureStop().getName()+"하차");
-                            Log.i("route", "버스 "+s.getTransitDetails().getLine().getShort_name()+"탑승");
+                            Log.i("route", s.getTransitDetails().getArrivalStop().getName());
+                            Log.i("route", "> " + s.getTransitDetails().getDepartureStop().getName() + "하차");
+                            //Log.i("route", "버스 " + s.getTransitDetails().getLine().getShort_name() + "탑승");
 
                             break;
                         case "WALKING":
-//                            Log.i("route", "도보 경로");
+                            Log.i("route", "도보 ");
 //                            Log.i("route", "Distance: " + s.getDistance().getText());
-                            Log.i("route", "\n도보 " + s.getDuration().getText());
+                            WalkingDuration += Integer.parseInt(s.getDuration().getText());
+                            Log.i("route", WalkingDuration + "분");
 //                            Log.i("route", "HTML Instruc" + s.getHtmlInstructions());
 
                             break;
                     }
                 }
+
+                String duration = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
+
+                durationList.add(duration); // 총 걸리는 시간
+                walkingDurationList.add(WalkingDuration); // 총 도보 시간
+
+                Toast.makeText(RouteActivity.this, "총 걸리는 시간"+ duration.indexOf(0), Toast.LENGTH_LONG).show();
+                Toast.makeText(RouteActivity.this, "총 도보 시간"+ walkingDurationList.indexOf(0), Toast.LENGTH_LONG).show();
+
+
+
                 //distance duration html_instructions travel_mode
                 /*
                 for (Routes routes : response.body().getRoutes()) {
@@ -201,4 +217,12 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
             }
         });
     }
+/*
+    private class CustmoAdqpter extends ArrayList<String> {
+        Context context;
+
+        public CustmoAdqpter(Context context) {
+            super(context, R.layout.fragment_route_list, )
+        }
+    }*/
 }
