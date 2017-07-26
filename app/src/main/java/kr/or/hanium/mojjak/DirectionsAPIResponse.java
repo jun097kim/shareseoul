@@ -20,45 +20,101 @@ class Routes {
     @Expose
     private ArrayList<Legs> legs;
 
+    @SerializedName("warnings")
+    @Expose
+    private String warnings;
+
     public ArrayList<Legs> getLegs() {
         return legs;
     }
+
+    public String getWarnings() {return warnings;}
 }
 
 class Legs {
+    @SerializedName("duration") // 총 시간
+    @Expose
+    private Duration duration;
+
+    @SerializedName("distance") // 총 거리
+    @Expose
+    private Distance distance;
+
+    @SerializedName("start_address")
+    @Expose
+    private String start_address;
+
+    @SerializedName("end_address")
+    @Expose
+    private String  end_address;
+
     @SerializedName("steps")
     @Expose
     private ArrayList<Steps> steps;
+
+    public Duration getDuration() {return duration;}
+
+    public Distance getDistance() {return distance;}
+
+    public String getStart_address() {return start_address;}
+
+    public String getEnd_address() {return end_address;}
 
     public ArrayList<Steps> getSteps() {
         return steps;
     }
 }
 
-class Steps {
-    @SerializedName("duration")
+class Steps { //Steps01
+    @SerializedName("duration") //Steps로 몇분?
     @Expose
     private Duration duration;
+
+    @SerializedName("distance")
+    @Expose
+    private Distance distance;
 
     @SerializedName("transit_details")
     @Expose
     private TransitDetails transitDetails;
 
-    @SerializedName("steps")
+    @SerializedName("html_instructions")
     @Expose
-    private ArrayList<WalkingSteps> steps;
+    private String htmlInstructions;
 
-    public Duration getDuration() {
-        return duration;
-    }
+    @SerializedName("steps") //WalkingSteps1
+    @Expose
+    private ArrayList<Steps> steps;
 
-    public TransitDetails getTransitDetails() {
-        return transitDetails;
-    }
+    @SerializedName("travel_mode")
+    @Expose
+    private String travelmode;
 
-    public ArrayList<WalkingSteps> getSteps() {
+    @SerializedName("headsign")
+    @Expose
+    private String headsign;
+
+    @SerializedName("line")
+    @Expose
+    private Line line;
+
+    public Duration getDuration() {return duration;}
+
+    public Distance getDistance() {return distance;}
+
+    public TransitDetails getTransitDetails() {return transitDetails;}
+
+    public String getHtmlInstructions() {return htmlInstructions;}
+
+    public ArrayList<Steps> getSteps() {
         return steps;
     }
+
+    public String getTravelmode() {return travelmode;}
+
+    public String getHeadsign() {return headsign;}
+
+    public Line getLine() {return line;}
 }
 
 class Duration {
@@ -71,6 +127,9 @@ class Duration {
     }
 }
 
+class Distance extends Duration{
+}
+
 class TransitDetails {
     @SerializedName("departure_stop")
     @Expose
@@ -80,6 +139,10 @@ class TransitDetails {
     @Expose
     private ArrivalStop arrivalStop;
 
+    @SerializedName("line")
+    @Expose
+    private Line line;
+
     public DepartureStop getDepartureStop() {
         return departureStop;
     }
@@ -87,6 +150,8 @@ class TransitDetails {
     public ArrivalStop getArrivalStop() {
         return arrivalStop;
     }
+
+    public Line getLine() {return line;}
 }
 
 class DepartureStop {
@@ -102,35 +167,67 @@ class DepartureStop {
 class ArrivalStop extends DepartureStop {
 }
 
+class Line {
+    @SerializedName("short_name") //몇호선
+    @Expose
+    private String short_name;
 
-class WalkingSteps {
+    @SerializedName("name") //예) 서울지하철, 인천 광역버스
+    @Expose
+    private String name;
+
+    @SerializedName("vehicle")
+    @Expose
+    private Vehicle vehicle;
+
+    public String getShort_name() {return short_name;}
+
+    public String getName() {return name;}
+
+    public Vehicle getVehicle() {return vehicle;}
+}
+
+class Vehicle {
+    @SerializedName("name") //예) 지하철 or 버스
+    @Expose
+    private String name;
+
+    @SerializedName("type") //(영어로) SUBWAY / BUS
+    @Expose
+    private String type;
+
+    public String getName() {return name;}
+
+    public String getType() {return type;}
+}
+
+
+class innerSteps {
     @SerializedName("distance")
     @Expose
-    private WalkingDistance distance;
+    private innerDistance distance;
 
     @SerializedName("duration")
     @Expose
-    private WalkingDuration duration;
+    private innerDuration duration;
 
-    public WalkingDistance getDistance() {
+    @SerializedName("travel_mode")
+    @Expose
+    private String travelmode;
+
+    public innerDistance getDistance() {
         return distance;
     }
 
-    public WalkingDuration getDuration() {
+    public innerDuration getDuration() {
         return duration;
     }
+
+    public String getTravelmode() {return travelmode;}
 }
 
-class WalkingDistance {
-    @SerializedName("text")
-    @Expose
-    private String text;
-
-    public String getText() {
-        return text;
-    }
+class innerDistance extends Duration {
 }
 
-class WalkingDuration extends WalkingDistance {
-
+class innerDuration extends innerDistance {
 }

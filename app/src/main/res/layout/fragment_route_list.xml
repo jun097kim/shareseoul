@@ -1,16 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="kr.or.hanium.mojjak.RouteListFragment"
-    tools:showIn="@layout/activity_route">
+    android:padding="8dp">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/route_recycler_view"
+    <ListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content">
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/total_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/walking_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="19sp"
+        android:textStyle="normal"/>
+    
+    <TextView
+        android:id="@+id/start_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/total_time"
+        android:layout_marginTop="8dp"
+        android:textSize="15sp"
+        android:textStyle="normal"/>
+
+    <ImageView
+        android:id="@+id/ic_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow"
+        android:layout_alignRight="@+id/start_name"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        android:id="@+id/arrival_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/ic_arrow"
+        android:layout_marginLeft="5dp"
+        android:textSize="15sp"
+        android:textStyle="normal" />
+
+
+    </ListView>
+
+</RelativeLayout>

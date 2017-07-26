@@ -9,12 +9,12 @@ import android.widget.TextView;
 import java.util.List;
 
 // Adapter: 아이템 데이터와 뷰 간의 처리
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
-    private List<Album> albumList;
+public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> {
+    private List<Route> routeList;
     private int itemLayout;
 
-    public RecyclerAdapter(List<Album> items, int itemLayout) {
-        this.albumList = items;
+    public RouteAdapter(List<Route> items, int itemLayout) {
+        this.routeList = items;
         this.itemLayout = itemLayout;
     }
 
@@ -26,7 +26,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        Album item = albumList.get(position);
+        Route item = routeList.get(position);
         viewHolder.textTitle.setText(item.getTitle());
         viewHolder.duration.setText(item.getDuration());
         viewHolder.artist.setText(item.getArtist());
@@ -35,7 +35,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return albumList.size();
+        return routeList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

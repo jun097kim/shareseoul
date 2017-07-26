@@ -4,16 +4,16 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface PlaceAPIService {
+public interface PlacesAPIService {
     String API_URL = "https://apis.daum.net/local/v1/search/"; // public static final 생략
 
     @GET("keyword.json")
-    Call<PlaceAPIResponse> getPlaces(@Query("apikey")
+    Call<PlacesAPIResponse> getPlaces(@Query("apikey")
                                            String apikey,
-                                     @Query("query")
+                                      @Query("query")
                                            String query,
-                                     @Query("location")
+                                      @Query("location")
                                            String location,
-                                     @Query("radius")
+                                      @Query("radius")
                                            int radius);
 }
