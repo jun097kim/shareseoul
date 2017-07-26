@@ -34,10 +34,8 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.google.android.gms:play-services-places:11.0.2'    // 검색어 자동완성
-    compile 'com.google.firebase:firebase-messaging:10.0.1' //추가한 부분
-
     testCompile 'junit:junit:4.12'
 }
-apply plugin: 'com.google.gms.google-services' //추가한부분
+
 
 
