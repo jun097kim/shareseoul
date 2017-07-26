@@ -5,7 +5,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraIdleListener, View.OnClickListener, GoogleMap.OnMarkerClickListener, RatingBar.OnRatingBarChangeListener {
 
     private GoogleMap mMap;
-    private PlaceAPIService mPlaceAPIService;
+    private PlacesAPIService mPlaceAPIService;
     private RatingBar rbMyRating;
     private Marker marker;
     @Override
@@ -82,10 +81,10 @@ public class MainActivity extends AppCompatActivity
 
         // 다음 로컬 API
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(PlaceAPIService.API_URL)
+                .baseUrl(PlacesAPIService.API_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        mPlaceAPIService = retrofit.create(PlaceAPIService.class);
+        mPlaceAPIService = retrofit.create(PlacesAPIService.class);
     }
 
     @Override
@@ -181,10 +180,10 @@ public class MainActivity extends AppCompatActivity
                 LatLng target = mMap.getCameraPosition().target;
 
 
-                mPlaceAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
+                mPlaceAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlacesAPIResponse>() {
 
                     @Override
-                    public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {
+                    public void onResponse(Call<PlacesAPIResponse> call, Response<PlacesAPIResponse> response) {
                         if (response.code() == 200) {   // request.code(): HTTP 상태 코드
                             for (Item item : response.body().getChannel().getItem()) {
                                 String id = item.getId();
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     @Override
-                    public void onFailure(Call<PlaceAPIResponse> call, Throwable t) {
+                    public void onFailure(Call<PlacesAPIResponse> call, Throwable t) {
                         Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });

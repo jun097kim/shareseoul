@@ -33,23 +33,6 @@
         android:textSize="15sp"
         android:textStyle="normal"/>
 
-    <ImageView
-        android:id="@+id/ic_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow"
-        android:layout_alignRight="@+id/start_name"
-        android:layout_marginLeft="5dp"/>
-
-    <TextView
-        android:id="@+id/arrival_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/ic_arrow"
-        android:layout_marginLeft="5dp"
-        android:textSize="15sp"
-        android:textStyle="normal" />
-
 
     </ListView>
 
