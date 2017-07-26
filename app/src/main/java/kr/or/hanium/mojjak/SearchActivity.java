@@ -1,90 +1,79 @@
 package kr.or.hanium.mojjak;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import java.util.ArrayList;
 
-public class SearchActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-    String mSearchType;
+public class SearchActivity extends Activity implements TextWatcher {
+
+    ArrayList<sItem> list;
+    ArrayAdapter<String> adapter;
+    AutoCompleteTextView autoCompleteTextView;
+    private SearchAPIService mSearchAPIService;
+    private TextView mSearchResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_search_pracitce);
 
-        // 자동완성 위젯 추가
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-
-        // 힌트 텍스트 설정
-        mSearchType = getIntent().getExtras().getString("searchType");
-        String hint = null;
-
-        switch (mSearchType) {
-            case "normal":
-                hint = "장소, 버스, 지하철 검색";
-                break;
-            case "origin":
-                hint = "출발지 검색";
-                break;
-            case "destination":
-                hint = "도착지 검색";
-        }
-
-        autocompleteFragment.setHint(hint);
-
-
-        // 한국으로 자동완성 결과 제한
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                .setCountry("KR")
+        autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+        autoCompleteTextView.addTextChangedListener(this);
+        String text = autoCompleteTextView.getText().toString();
+        // 다음 로컬 API
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SearchAPIService.API_URL)
+                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
+        mSearchAPIService = retrofit.create(SearchAPIService.class);
+    }
 
-        autocompleteFragment.setFilter(typeFilter);
-
-
-        // 검색 결과 아이템을 눌렀을 때 호출
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+    @Override
+    public void afterTextChanged(Editable s) {
+        mSearchAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", s.toString()).enqueue(new Callback<SearchAPIResponse>() {
             @Override
-            public void onPlaceSelected(Place place) {
-                if (mSearchType.equals("normal")) {
-                    Toast.makeText(SearchActivity.this, place.getName() + "\n" + place.getAddress(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Intent intent = new Intent();
-                    intent.putExtra("result", place.getName());
+            public void onResponse(Call<SearchAPIResponse> call, Response<SearchAPIResponse> response) {
+                if (response.body().getChannel() != null) {
+                    list = response.body().getChannel().getItem();
+                    ArrayList<String> resultList = new ArrayList<String>();
+                    for (sItem sItem : list) {
+                        resultList.add(sItem.getTitle());
+                    }
 
-                    setResult(RESULT_OK, intent);
-                    finish();
+                    autoCompleteTextView.setAdapter(new ArrayAdapter<String>(SearchActivity.this, android.R.layout.simple_dropdown_item_1line, resultList));
                 }
             }
 
             @Override
-            public void onError(Status status) {
+            public void onFailure(Call<SearchAPIResponse> call, Throwable t) {
+                Log.i("info", t.getMessage());
+
             }
         });
-
     }
 
-
-    // Back 버튼을 눌렀을 때 호출
     @Override
-    public void onBackPressed() {
-        if (!mSearchType.equals("normal")) {
-            Intent intent = new Intent();
-            setResult(RESULT_CANCELED, intent);
-        }
-        super.onBackPressed();
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
     }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
 
 }

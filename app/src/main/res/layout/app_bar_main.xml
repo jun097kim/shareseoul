@@ -85,7 +85,7 @@
                         android:paddingRight="16dp"
                         android:paddingTop="16dp"
                         android:text="화장실 평점"
-                        android:textAppearance="@style/TextAppearance.AppCompat.title" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -120,15 +120,15 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/toilet_place"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="지하철"
                         android:textColor="@color/colorAccent" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" 화장실을 이용하셨나요? 화장실을 평가해주세요."
+                        android:text="을 이용하셨나요? 화장실을 평가해주세요."
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
 

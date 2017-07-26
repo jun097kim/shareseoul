@@ -26,6 +26,10 @@ class Channel { // default: 같은 패키지
 }
 
 class Item {
+    @SerializedName("id")
+    @Expose
+    private String id;
+
     @SerializedName("title")
     @Expose
     private String title;
@@ -37,6 +41,10 @@ class Item {
     @SerializedName("latitude")
     @Expose
     private String latitude;
+
+    public String getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;

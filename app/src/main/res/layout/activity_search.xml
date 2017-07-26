@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <fragment
-            android:id="@+id/place_autocomplete_fragment"
-            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_search" />
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -5,7 +5,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +12,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -34,11 +36,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraIdleListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraIdleListener, View.OnClickListener, GoogleMap.OnMarkerClickListener, RatingBar.OnRatingBarChangeListener {
 
     private GoogleMap mMap;
     private PlaceAPIService mPlaceAPIService;
-
+    private RatingBar rbMyRating;
+    private Marker marker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        rbMyRating = (RatingBar) findViewById(R.id.my_rating);
+        rbMyRating.setOnRatingBarChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         TextView searchBtn = (TextView) findViewById(R.id.search_btn);
@@ -174,18 +179,22 @@ public class MainActivity extends AppCompatActivity
             case R.id.fab:
                 LatLng target = mMap.getCameraPosition().target;
 
+
                 mPlaceAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlaceAPIResponse>() {
 
                     @Override
                     public void onResponse(Call<PlaceAPIResponse> call, Response<PlaceAPIResponse> response) {
                         if (response.code() == 200) {   // request.code(): HTTP 상태 코드
                             for (Item item : response.body().getChannel().getItem()) {
+                                String id = item.getId();
                                 String title = item.getTitle();
                                 Double latitude = Double.parseDouble(item.getLatitude());
                                 Double longitude = Double.parseDouble(item.getLongitude());
 
                                 LatLng wc = new LatLng(latitude, longitude);                     // 화장실 좌표
-                                mMap.addMarker(new MarkerOptions().position(wc).title(title));   // 화장실 마커 추가
+                                Marker marker = mMap.addMarker(new MarkerOptions().position(wc).title(title));   // 화장실 마커 추가
+                                marker.setTag(id);
+                                mMap.setOnMarkerClickListener(MainActivity.this);
                             }
                         } else {
                             Toast.makeText(MainActivity.this, "API 트래픽이 초과되었습니다.", Toast.LENGTH_SHORT).show();
@@ -214,6 +223,48 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
 
                 overridePendingTransition(0, 0);
+
         }
+    }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
+        toiletPlace.setText(marker.getTitle());
+
+        this.marker = marker;
+        return false;
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        String placeID = marker.getTag().toString();
+        int myRating = (int) rbMyRating.getRating();
+
+        // 평점 API
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(RatingAPIService.API_URL)
+                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                .build();
+        RatingAPIService ratingAPIService = retrofit.create(RatingAPIService.class);
+
+        ratingAPIService.getSuccess(placeID, myRating).enqueue(new Callback<RatingAPIResponse>() {
+            @Override
+            public void onResponse(Call<RatingAPIResponse> call, Response<RatingAPIResponse> response) {
+                if (!response.body().getSuccess()) {
+                    Toast.makeText(MainActivity.this, "평점 등록에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "평점 등록에 성공했습니다.", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RatingAPIResponse> call, Throwable t) {
+
+            }
+        });
+
     }
 }
