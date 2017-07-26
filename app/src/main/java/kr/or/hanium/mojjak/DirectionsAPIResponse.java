@@ -20,9 +20,15 @@ class Routes {
     @Expose
     private ArrayList<Legs> legs;
 
+    @SerializedName("warnings")
+    @Expose
+    private String warnings;
+
     public ArrayList<Legs> getLegs() {
         return legs;
     }
+
+    public String getWarnings() {return warnings;}
 }
 
 class Legs {
@@ -30,11 +36,29 @@ class Legs {
     @Expose
     private Duration duration;
 
+    @SerializedName("distance")
+    @Expose
+    private Distance distance;
+
+    @SerializedName("start_address")
+    @Expose
+    private String start_address;
+
+    @SerializedName("end_address")
+    @Expose
+    private String  end_address;
+
     @SerializedName("steps")
     @Expose
     private ArrayList<Steps> steps;
 
     public Duration getDuration() {return duration;}
+
+    public Distance getDistance() {return distance;}
+
+    public String getStart_address() {return start_address;}
+
+    public String getEnd_address() {return end_address;}
 
     public ArrayList<Steps> getSteps() {
         return steps;
@@ -66,6 +90,14 @@ class Steps { //Steps01
     @Expose
     private String travelmode;
 
+    @SerializedName("headsign")
+    @Expose
+    private String headsign;
+
+    @SerializedName("line")
+    @Expose
+    private Line line;
+
     public Duration getDuration() {return duration;}
 
     public Distance getDistance() {return distance;}
@@ -79,6 +111,10 @@ class Steps { //Steps01
     }
 
     public String getTravelmode() {return travelmode;}
+
+    public String getHeadsign() {return headsign;}
+
+    public Line getLine() {return line;}
 }
 
 class Duration {
@@ -132,11 +168,37 @@ class ArrivalStop extends DepartureStop {
 }
 
 class Line {
-    @SerializedName("short_name")
+    @SerializedName("short_name") //몇호선
     @Expose
     private String short_name;
 
+    @SerializedName("name") //예) 서울지하철, 인천 광역버스
+    @Expose
+    private String name;
+
+    @SerializedName("vehicle")
+    @Expose
+    private Vehicle vehicle;
+
     public String getShort_name() {return short_name;}
+
+    public String getName() {return name;}
+
+    public Vehicle getVehicle() {return vehicle;}
+}
+
+class Vehicle {
+    @SerializedName("name") //예) 지하철 or 버스
+    @Expose
+    private String name;
+
+    @SerializedName("type") //(영어로) SUBWAY / BUS
+    @Expose
+    private String type;
+
+    public String getName() {return name;}
+
+    public String getType() {return type;}
 }
 
 
