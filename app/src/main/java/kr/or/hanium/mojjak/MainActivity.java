@@ -1,6 +1,7 @@
 package kr.or.hanium.mojjak;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RatingBar;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity
     private PlacesAPIService mPlaceAPIService;
     private RatingBar rbMyRating;
     private Marker marker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,14 +53,15 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        rbMyRating = (RatingBar) findViewById(R.id.my_rating);
-        rbMyRating.setOnRatingBarChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         TextView searchBtn = (TextView) findViewById(R.id.search_btn);
 
         fab.setOnClickListener(this);
         searchBtn.setOnClickListener(this);
+
+        rbMyRating = (RatingBar) findViewById(R.id.my_rating);
+        rbMyRating.setOnRatingBarChangeListener(this);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -66,12 +70,23 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        RelativeLayout navLogin = (RelativeLayout) headerView.findViewById(R.id.nav_login);
 
+        // 네비게이션 헤더(로그인 메뉴)에 리스너 설정
+        RelativeLayout navLogin = (RelativeLayout) headerView.findViewById(R.id.nav_login);
         navigationView.setNavigationItemSelectedListener(this);
         navLogin.setOnClickListener(this);
+
+        // 로그인되어 있는지 확인
+        TextView tvEmail = (TextView) headerView.findViewById(R.id.tv_email);
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        String email = pref.getString("email", "");
+        if (!TextUtils.isEmpty(email)) {
+            tvEmail.setText(email);
+//            navLogin.setOnClickListener(null);
+        }
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -179,9 +194,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.fab:
                 LatLng target = mMap.getCameraPosition().target;
 
-
                 mPlaceAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "화장실", target.latitude + "," + target.longitude, 10000).enqueue(new Callback<PlacesAPIResponse>() {
-
                     @Override
                     public void onResponse(Call<PlacesAPIResponse> call, Response<PlacesAPIResponse> response) {
                         if (response.code() == 200) {   // request.code(): HTTP 상태 코드
@@ -213,17 +226,13 @@ public class MainActivity extends AppCompatActivity
                 intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("searchType", "normal");
                 startActivity(intent);
-
                 overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
-
                 break;
 
             case R.id.nav_login:
                 intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
-
                 overridePendingTransition(0, 0);
-
         }
     }
 
