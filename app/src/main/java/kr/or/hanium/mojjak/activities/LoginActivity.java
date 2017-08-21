@@ -1,0 +1,100 @@
+package kr.or.hanium.mojjak.activities;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import kr.or.hanium.mojjak.models.LoginAPIResponse;
+import kr.or.hanium.mojjak.interfaces.LoginAPIService;
+import kr.or.hanium.mojjak.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        Button btnLogin = (Button) findViewById(R.id.btn_login);
+        btnLogin.setOnClickListener(this);
+
+        Button btnToRegister = (Button) findViewById(R.id.btn_to_register);
+        btnToRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
+            }
+        });
+    }
+
+    @Override
+    public void onClick(View v) {
+        EditText etEmail = (EditText) findViewById(R.id.et_email);
+        EditText etPassword = (EditText) findViewById(R.id.et_password);
+
+        final String email = etEmail.getText().toString();
+        String password = etPassword.getText().toString();
+
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "올바른 이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+        } else if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+        } else {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(LoginAPIService.API_URL)
+                    .addConverterFactory(GsonConverterFactory.create())  // JSON Converter 지정
+                    .build();
+            LoginAPIService loginAPIService = retrofit.create(LoginAPIService.class);
+
+            loginAPIService.getLogin(email, password).enqueue(new Callback<LoginAPIResponse>() {
+                @Override
+                public void onResponse(Call<LoginAPIResponse> call, Response<LoginAPIResponse> response) {
+                    if (response.body().getResult()) {
+                        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putInt("id", 3);
+                        editor.putString("email", email);
+                        editor.commit();
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(LoginActivity.this, "이메일 또는 비밀번호를 다시 확인해주세요.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<LoginAPIResponse> call, Throwable t) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // 로그인 성공시 액티비티 스택에서 지움(뒤로가기 막기)
+        finish();
+    }
+}

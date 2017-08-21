@@ -23,8 +23,49 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activities.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.RouteActivity"
+            android:label="@string/title_activity_route"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="kr.or.hanium.mojjak.activities.MainActivity" />
+            <!-- Android 4.1 (API level 16) 이전 -->
+        </activity>
+        <activity
+            android:name=".activities.RouteViewActivity"
+            android:label="@string/title_activity_route_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.BikesActivity"
+            android:label="@string/title_activity_bikes"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.RestaurantsActivity"
+            android:label="@string/title_activity_restaurants"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.PickActivity"
+            android:label="@string/title_activity_pick"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,40 +73,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SearchActivity"
-            android:label="@string/title_activity_search"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".RouteActivity"
-            android:label="@string/title_activity_route"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="kr.or.hanium.mojjak.MainActivity" />
-            <!-- Android 4.1 (API level 16) 이전 -->
-        </activity>
-        <activity
-            android:name=".RouteViewActivity"
-            android:label="@string/title_activity_route_view"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SubwayActivity"
-            android:label="@string/title_activity_subway"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".RegisterActivity"
-            android:label="@string/title_activity_register"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-
     </application>
 
 </manifest>

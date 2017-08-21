@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.or.hanium.mojjak.RegisterActivity">
+    tools:context="kr.or.hanium.mojjak.activities.RegisterActivity">
     <!--
     activity_register.xml(RegisterActivity.java)
     <- content_register.xml

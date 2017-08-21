@@ -11,9 +11,11 @@
             android:icon="@drawable/ic_menu_route"
             android:title="길찾기" />
         <item
-            android:id="@+id/nav_train"
-            android:icon="@drawable/ic_menu_train"
-            android:title="지하철 노선도" />
+            android:id="@+id/nav_restaurants"
+            android:title="맛집" />
+        <item
+            android:id="@+id/nav_bikes"
+            android:title="따릉이 대여소" />
     </group>
 
 </menu>

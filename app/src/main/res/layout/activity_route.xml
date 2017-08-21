@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="kr.or.hanium.mojjak.RouteActivity">
+    tools:context="kr.or.hanium.mojjak.activities.RouteActivity">
     <!--
     activity_route.xml(RouteActivity.java)
     <- content_route.xml

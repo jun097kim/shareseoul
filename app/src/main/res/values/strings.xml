@@ -11,4 +11,7 @@
     <string name="title_activity_subway">지하철 노선도</string>
     <string name="title_activity_login">로그인</string>
     <string name="title_activity_register">회원가입</string>
+    <string name="title_activity_bikes">따릉이 대여소</string>
+    <string name="title_activity_restaurants">맛집</string>
+    <string name="title_activity_pick">가까운 곳</string>
 </resources>

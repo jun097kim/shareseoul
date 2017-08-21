@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="kr.or.hanium.mojjak.SearchHistoryFragment"
+    tools:context="kr.or.hanium.mojjak.fragments.SearchHistoryFragment"
     tools:showIn="@layout/activity_search">
 
     <TextView
