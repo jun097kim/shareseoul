@@ -5,8 +5,8 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface RestaurantsAPIService {
-    String API_URL = "https://apis.daum.net/local/v1/search/";  // public static final 생략
+public interface RestaurantsService {
+    String BASE_URL = "https://apis.daum.net/local/v1/search/";  // public static final 생략
 
     @GET("category.json")
     Call<Restaurant> getPlaces(@Query("apikey")

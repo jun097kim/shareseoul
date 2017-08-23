@@ -8,10 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.models.Bike;
 
@@ -31,6 +32,18 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
 
     @Override
     public void onBindViewHolder(BikesViewHolder holder, int position) {
+        String firstLetter = String.valueOf(bikes.get(position).getName().charAt(0));
+
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        // generate random color
+        int color = generator.getRandomColor();
+        // generate color based on a key (same key returns the same color), useful for list/grid views
+//        int color = generator.getColor(firstLetter);
+
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(firstLetter, color);
+
+        holder.ivBikesItem.setImageDrawable(drawable);
         holder.tvBikes.setText(bikes.get(position).getName());
     }
 
@@ -41,16 +54,15 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
     }
 
     public static class BikesViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.cv_bikes)
-        CardView cvBikes;
-        @BindView(R.id.iv_bikes_item)
-        ImageView ivBikesItem;
-        @BindView(R.id.tv_bikes)
-        TextView tvBikes;
+        public CardView cvBikes;
+        public ImageView ivBikesItem;
+        public TextView tvBikes;
 
-        BikesViewHolder(View viewItem) {
-            super(viewItem);
-            ButterKnife.bind(this, viewItem);
+        public BikesViewHolder(View v) {
+            super(v);
+            cvBikes = v.findViewById(R.id.cv_bikes);
+            ivBikesItem = v.findViewById(R.id.iv_bikes_item);
+            tvBikes = v.findViewById(R.id.tv_bikes);
         }
     }
 }

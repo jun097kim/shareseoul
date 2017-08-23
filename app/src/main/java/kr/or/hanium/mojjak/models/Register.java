@@ -3,7 +3,7 @@ package kr.or.hanium.mojjak.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LoginAPIResponse {
+public class Register {
     @SerializedName("result")
     @Expose
     private Boolean result;

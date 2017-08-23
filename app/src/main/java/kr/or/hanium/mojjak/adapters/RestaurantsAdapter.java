@@ -1,6 +1,7 @@
 package kr.or.hanium.mojjak.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -35,6 +38,15 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
     public void onBindViewHolder(RestaurantsViewHolder holder, int position) {
         holder.mTextView.setText(mItem.get(position).getTitle());
         Picasso.with(mContext).load(mItem.get(position).getImageUrl()).into(holder.mImageView);
+
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        int color = generator.getRandomColor();
+        TextDrawable drawable = TextDrawable.builder()
+                .beginConfig()
+                    .bold()
+                .endConfig()
+                .buildRect("5", Color.parseColor("#4caf50"));
+        holder.ivRating.setImageDrawable(drawable);
     }
 
     @Override
@@ -46,11 +58,13 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
         // each data item is just a string in this case
         public ImageView mImageView;
         public TextView mTextView;
+        public ImageView ivRating;
 
         public RestaurantsViewHolder(View view) {
             super(view);
             mImageView = (ImageView) view.findViewById(R.id.food_img);
             mTextView = (TextView) view.findViewById(R.id.food_title);
+            ivRating = view.findViewById(R.id.iv_rating);
         }
     }
 }

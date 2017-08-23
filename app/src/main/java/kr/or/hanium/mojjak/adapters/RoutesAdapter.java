@@ -12,28 +12,28 @@ import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.models.Route;
 
 // Adapter: 아이템 데이터와 뷰 간의 처리
-public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
+public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.RoutesViewHolder> {
     private List<Route> routeList;
     private int itemLayout;
 
-    public RouteAdapter(List<Route> items, int itemLayout) {
+    public RoutesAdapter(List<Route> items, int itemLayout) {
         this.routeList = items;
         this.itemLayout = itemLayout;
     }
 
     @Override
-    public RouteViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public RoutesViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(itemLayout, viewGroup, false);
-        return new RouteViewHolder(view);
+        return new RoutesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RouteViewHolder routeViewHolder, int position) {
+    public void onBindViewHolder(RoutesViewHolder routesViewHolder, int position) {
         Route item = routeList.get(position);
-        routeViewHolder.textTitle.setText(item.getTitle());
-        routeViewHolder.duration.setText(item.getDuration());
-        routeViewHolder.artist.setText(item.getArtist());
-        routeViewHolder.itemView.setTag(item);
+        routesViewHolder.textTitle.setText(item.getTitle());
+        routesViewHolder.duration.setText(item.getDuration());
+        routesViewHolder.artist.setText(item.getArtist());
+        routesViewHolder.itemView.setTag(item);
     }
 
     @Override
@@ -41,17 +41,17 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         return routeList.size();
     }
 
-    public static class RouteViewHolder extends RecyclerView.ViewHolder {
+    public static class RoutesViewHolder extends RecyclerView.ViewHolder {
         public TextView duration;
         public TextView textTitle;
         public TextView artist;
 
-        public RouteViewHolder(View itemView) {
+        public RoutesViewHolder(View itemView) {
             super(itemView);
 
-            duration = (TextView) itemView.findViewById(R.id.imgProfile);
-            textTitle = (TextView) itemView.findViewById(R.id.textTitle);
-            artist = (TextView) itemView.findViewById(R.id.textArtist);
+            duration = itemView.findViewById(R.id.imgProfile);
+            textTitle = itemView.findViewById(R.id.textTitle);
+            artist = itemView.findViewById(R.id.textArtist);
         }
     }
 }

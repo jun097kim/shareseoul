@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import kr.or.hanium.mojjak.models.LoginAPIResponse;
-import kr.or.hanium.mojjak.interfaces.LoginAPIService;
+import kr.or.hanium.mojjak.models.Login;
+import kr.or.hanium.mojjak.interfaces.LoginService;
 import kr.or.hanium.mojjak.R;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,14 +60,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
         } else {
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(LoginAPIService.API_URL)
+                    .baseUrl(LoginService.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())  // JSON Converter 지정
                     .build();
-            LoginAPIService loginAPIService = retrofit.create(LoginAPIService.class);
+            LoginService loginService = retrofit.create(LoginService.class);
 
-            loginAPIService.getLogin(email, password).enqueue(new Callback<LoginAPIResponse>() {
+            loginService.getLogin(email, password).enqueue(new Callback<Login>() {
                 @Override
-                public void onResponse(Call<LoginAPIResponse> call, Response<LoginAPIResponse> response) {
+                public void onResponse(Call<Login> call, Response<Login> response) {
                     if (response.body().getResult()) {
                         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = pref.edit();
@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
 
                 @Override
-                public void onFailure(Call<LoginAPIResponse> call, Throwable t) {
+                public void onFailure(Call<Login> call, Throwable t) {
 
                 }
             });

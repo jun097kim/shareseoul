@@ -1,82 +1,97 @@
 package kr.or.hanium.mojjak.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import java.util.ArrayList;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
+import java.util.List;
 
 import kr.or.hanium.mojjak.R;
-import kr.or.hanium.mojjak.interfaces.SearchAPIService;
-import kr.or.hanium.mojjak.models.SearchAPIResponse;
+import kr.or.hanium.mojjak.adapters.SearchAdapter;
+import kr.or.hanium.mojjak.interfaces.SearchService;
+import kr.or.hanium.mojjak.models.Search;
+import kr.or.hanium.mojjak.models.Search.Results;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SearchActivity extends Activity implements TextWatcher {
-
-    ArrayList<SearchAPIResponse.sItem> list;
-    ArrayAdapter<String> adapter;
-    AutoCompleteTextView autoCompleteTextView;
-    private SearchAPIService mSearchAPIService;
-    private TextView mSearchResult;
+public class SearchActivity extends AppCompatActivity {
+    MaterialSearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_pracitce);
+        setContentView(R.layout.activity_search);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // 툴바 Up 버튼 추가
 
-        autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-        autoCompleteTextView.addTextChangedListener(this);
-        String text = autoCompleteTextView.getText().toString();
-        // 다음 로컬 API
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SearchAPIService.API_URL)
-                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
-                .build();
-        mSearchAPIService = retrofit.create(SearchAPIService.class);
-    }
+        final RecyclerView rvSearch = (RecyclerView) findViewById(R.id.rv_search);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvSearch.setLayoutManager(linearLayoutManager);
 
-    @Override
-    public void afterTextChanged(Editable s) {
-        mSearchAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", s.toString()).enqueue(new Callback<SearchAPIResponse>() {
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
-            public void onResponse(Call<SearchAPIResponse> call, Response<SearchAPIResponse> response) {
-                if (response.body().getChannel() != null) {
-                    list = response.body().getChannel().getItem();
-                    ArrayList<String> resultList = new ArrayList<String>();
-                    for (SearchAPIResponse.sItem sItem : list) {
-                        resultList.add(sItem.getTitle());
+            public boolean onQueryTextSubmit(String query) {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(SearchService.BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                SearchService searchService = retrofit.create(SearchService.class);
+
+                Call<Search> searchCall = searchService.getPlaces("37.56,126.97", "50000", query, getString(R.string.google_api_key));
+                searchCall.enqueue(new Callback<Search>() {
+                    @Override
+                    public void onResponse(Call<Search> call, Response<Search> response) {
+                        List<Results> resultList = response.body().getResults();
+                        SearchAdapter searchAdapter = new SearchAdapter(resultList);
+                        rvSearch.setAdapter(searchAdapter);
                     }
 
-                    autoCompleteTextView.setAdapter(new ArrayAdapter<String>(SearchActivity.this, android.R.layout.simple_dropdown_item_1line, resultList));
-                }
+                    @Override
+                    public void onFailure(Call<Search> call, Throwable t) {
+
+                    }
+                });
+                return true;
             }
 
             @Override
-            public void onFailure(Call<SearchAPIResponse> call, Throwable t) {
-                Log.i("info", t.getMessage());
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
 
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
             }
         });
     }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(item);
+
+        return true;
     }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-
 }

@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import kr.or.hanium.mojjak.R;
-import kr.or.hanium.mojjak.models.RegisterAPIResponse;
-import kr.or.hanium.mojjak.interfaces.RegisterAPIService;
+import kr.or.hanium.mojjak.models.Register;
+import kr.or.hanium.mojjak.interfaces.RegisterService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,14 +53,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
         } else {
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(RegisterAPIService.API_URL)
+                    .baseUrl(RegisterService.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())  // JSON Converter 지정
                     .build();
-            RegisterAPIService registerAPIService = retrofit.create(RegisterAPIService.class);
+            RegisterService registerService = retrofit.create(RegisterService.class);
 
-            registerAPIService.getRegister(email, password, passwordConfirm).enqueue(new Callback<RegisterAPIResponse>() {
+            registerService.getRegister(email, password, passwordConfirm).enqueue(new Callback<Register>() {
                 @Override
-                public void onResponse(Call<RegisterAPIResponse> call, Response<RegisterAPIResponse> response) {
+                public void onResponse(Call<Register> call, Response<Register> response) {
                     if (response.body().getResult()) {
                         Toast.makeText(RegisterActivity.this, "가입해주셔서 감사합니다.", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
@@ -71,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
 
                 @Override
-                public void onFailure(Call<RegisterAPIResponse> call, Throwable t) {
+                public void onFailure(Call<Register> call, Throwable t) {
 
                 }
             });

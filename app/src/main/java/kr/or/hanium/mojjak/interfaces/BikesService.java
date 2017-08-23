@@ -7,8 +7,8 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface BikesAPI {
-    String API_URL = "http://jun0.kim:8080/";  // public static final 생략
+public interface BikesService {
+    String BASE_URL = "http://jun0.kim:8080/";  // public static final 생략
 
     @GET("bikes")
     Call<List<Bike>> getBike(@Query("latitude") String latitude, @Query("longitude") String longitude);

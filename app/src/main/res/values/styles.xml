@@ -14,7 +14,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="MaterialSearchViewStyle">
+        <!-- Hint for edit text -->
+        <item name="android:hint">검색</item>
+    </style>
 </resources>

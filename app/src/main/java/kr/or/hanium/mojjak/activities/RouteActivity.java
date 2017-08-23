@@ -15,11 +15,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import kr.or.hanium.mojjak.interfaces.DirectionsAPIService;
+import kr.or.hanium.mojjak.interfaces.DirectionsService;
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.models.Route;
-import kr.or.hanium.mojjak.adapters.RouteAdapter;
-import kr.or.hanium.mojjak.models.DirectionsAPIResponse;
+import kr.or.hanium.mojjak.adapters.RoutesAdapter;
+import kr.or.hanium.mojjak.models.Direction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,10 +28,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RouteActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private DirectionsAPIService mDirectionsAPIService;
+    private DirectionsService mDirectionsService;
     private RecyclerView mRouteRecyclerView;
     private ArrayList<Route> mRouteList = new ArrayList<>();
-    private RouteAdapter mRouteAdapter;
+    private RoutesAdapter mRoutesAdapter;
     private TextView mOrigin;
     private TextView mDestination;
 
@@ -61,13 +61,13 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
         // 구글 길찾기 API
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(DirectionsAPIService.API_URL)
+                .baseUrl(DirectionsService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        mDirectionsAPIService = retrofit.create(DirectionsAPIService.class);
+        mDirectionsService = retrofit.create(DirectionsService.class);
 
         initLayout();
-        mRouteAdapter = new RouteAdapter(mRouteList, R.layout.route_list_item);
+        mRoutesAdapter = new RoutesAdapter(mRouteList, R.layout.route_list_item);
 
     }
 
@@ -101,7 +101,7 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void initLayout() {
-        mRouteRecyclerView = (RecyclerView) findViewById(R.id.route_recycler_view);
+        mRouteRecyclerView = (RecyclerView) findViewById(R.id.rv_route);
     }
 
     // 데이터 초기화
@@ -139,16 +139,16 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
     private void showRouteList() {
         int size = mRouteList.size();
         mRouteList.clear();
-        mRouteAdapter.notifyItemRangeRemoved(0, size);
+        mRoutesAdapter.notifyItemRangeRemoved(0, size);
 
-        mDirectionsAPIService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak", "ko").enqueue(new Callback<DirectionsAPIResponse>() {
+        mDirectionsService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "ko", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak").enqueue(new Callback<Direction>() {
             @Override
-            public void onResponse(Call<DirectionsAPIResponse> call, Response<DirectionsAPIResponse> response) {
+            public void onResponse(Call<Direction> call, Response<Direction> response) {
 
-                ArrayList<DirectionsAPIResponse.Steps> steps = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
+                ArrayList<Direction.Steps> steps = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
                 Integer WalkingDuration = 0;
 
-                for (DirectionsAPIResponse.Steps s : steps) {
+                for (Direction.Steps s : steps) {
                     switch (s.getTravelmode()) {
 
                         case "TRANSIT":
@@ -211,13 +211,13 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
                 */
-                mRouteRecyclerView.setAdapter(mRouteAdapter);
+                mRouteRecyclerView.setAdapter(mRoutesAdapter);
                 mRouteRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 mRouteRecyclerView.addItemDecoration(new DividerItemDecoration(RouteActivity.this, LinearLayoutManager.VERTICAL));  // 구분선
             }
 
             @Override
-            public void onFailure(Call<DirectionsAPIResponse> call, Throwable t) {
+            public void onFailure(Call<Direction> call, Throwable t) {
 
             }
         });

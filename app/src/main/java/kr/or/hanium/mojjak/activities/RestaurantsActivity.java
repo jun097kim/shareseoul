@@ -2,7 +2,7 @@ package kr.or.hanium.mojjak.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.adapters.RestaurantsAdapter;
-import kr.or.hanium.mojjak.interfaces.RestaurantsAPIService;
+import kr.or.hanium.mojjak.interfaces.RestaurantsService;
 import kr.or.hanium.mojjak.models.Restaurant;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,19 +37,19 @@ public class RestaurantsActivity extends AppCompatActivity {
         rvRestaurants = (RecyclerView) findViewById(R.id.recyclerView);
         rvRestaurants.setHasFixedSize(true);
 
-        RecyclerView.LayoutManager rLayoutManager = new GridLayoutManager(this, 2);
-        rvRestaurants.setLayoutManager(rLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvRestaurants.setLayoutManager(linearLayoutManager);
         loadJson();
     }
 
     private void loadJson() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(RestaurantsAPIService.API_URL)
+                .baseUrl(RestaurantsService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        RestaurantsAPIService restaurantsAPIService = retrofit.create(RestaurantsAPIService.class);
+        RestaurantsService restaurantsService = retrofit.create(RestaurantsService.class);
 
-        Call<Restaurant> recommendationAPIResponseCall = restaurantsAPIService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "FD6", "37.56331,126.97590", "10000");
+        Call<Restaurant> recommendationAPIResponseCall = restaurantsService.getPlaces("12b7b22a1af7d9e2173ac88f2af8654f", "FD6", "37.56331,126.97590", "10000");
         recommendationAPIResponseCall.enqueue(new Callback<Restaurant>() {
             @Override
             public void onResponse(Call<Restaurant> call, Response<Restaurant> response) {

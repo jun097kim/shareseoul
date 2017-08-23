@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,17 +26,21 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.interfaces.BathroomsService;
-import kr.or.hanium.mojjak.interfaces.RatingAPIService;
+import kr.or.hanium.mojjak.interfaces.RatingService;
 import kr.or.hanium.mojjak.models.Bathroom;
-import kr.or.hanium.mojjak.models.RatingAPIResponse;
+import kr.or.hanium.mojjak.models.BathroomMarker;
+import kr.or.hanium.mojjak.models.Rating;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,12 +52,15 @@ import static kr.or.hanium.mojjak.R.id.map;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener, RatingBar.OnRatingBarChangeListener,
-        OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
+        OnMapReadyCallback, GoogleMap.OnCameraIdleListener, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
 
     private GoogleMap mMap;
     private BathroomsService mBathroomsService;
     private RatingBar rbMyRating;
-    private Marker marker;
+    private ClusterManager<BathroomMarker> mClusterManager;
+    private Set<String> visibleMarkers = new HashSet<>();
+    List<BathroomMarker> bathroomMarkers = new ArrayList<>();
+    BathroomMarker bathroomMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +109,12 @@ public class MainActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
+        handler.post(updateMarker);
 
-        // 다음 로컬 API
+        // 화장실 API
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BathroomsService.API_URL)
-                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                .baseUrl(BathroomsService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())  // JSON Converter 지정
                 .build();
         mBathroomsService = retrofit.create(BathroomsService.class);
     }
@@ -158,6 +167,74 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    Handler handler = new Handler();
+    Runnable updateMarker = new Runnable() {
+        @Override
+        public void run() {
+            LatLng target = mMap.getCameraPosition().target;  // 현재 보이는 지도의 중심 좌표
+
+            Geocoder geoCoder = new Geocoder(MainActivity.this);  // 좌표 ↔ 주소 변환기
+            List<Address> matches = null;
+            try {
+                matches = geoCoder.getFromLocation(target.latitude, target.longitude, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+            String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
+
+            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
+
+            if (bestMatch != null) {
+                if (bestMatch.getAdminArea() == null) {
+                    tvAddress.setText("");  // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
+                } else if (bestMatch.getAdminArea() != null) {
+                    tvAddress.setText(bestMatch.getLocality() + " ");
+                }
+                for (String s : strings) {
+                    if (s != null) tvAddress.append(s + " ");
+                }
+            } else {
+                tvAddress.setText("주소를 확인할 수 없습니다.");
+            }
+
+            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(target.latitude, target.longitude);
+            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
+                @Override
+                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
+                    for (Bathroom bathroom : response.body()) {
+                        String id = bathroom.getId();
+                        String title = bathroom.getTitle();
+                        double latitude = bathroom.getLatitude();
+                        double longitude = bathroom.getLongitude();
+
+                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
+                    }
+
+                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                    for (final BathroomMarker item : bathroomMarkers) {
+                        if (bounds.contains(item.getPosition())) {
+                            if (!visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.add(item.getId());
+                                mClusterManager.addItem(item);
+                            }
+                        } else {
+                            if (visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.remove(item.getId());
+                                mClusterManager.removeItem(item);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            mClusterManager.cluster();
+        }
+    };
 
     // 구글 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
 
@@ -165,61 +242,31 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnCameraIdleListener(this);
 
         LatLng seoul = new LatLng(37.56, 126.97);  // Lat(Latitude): 위도, Lng(Longitude): 경도
         mMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));  // 서울로 카메라 이동
         mMap.animateCamera(CameraUpdateFactory.zoomTo(16));  // 줌 레벨 16으로 설정
+
+        // 클러스터 매니저 생성
+        mClusterManager = new ClusterManager<>(this, mMap);
+        mClusterManager.setOnClusterItemClickListener(this);
+        mMap.setOnCameraIdleListener(this);
+        mMap.setOnMarkerClickListener(mClusterManager);
     }
 
     // 카메라 이동이 끝났을 때, 한 번만 호출
     @Override
     public void onCameraIdle() {
-        LatLng target = mMap.getCameraPosition().target;    // 현재 보이는 지도의 중심 좌표
-
-        Geocoder geoCoder = new Geocoder(this); // 좌표 ↔ 주소 변환기
-        List<Address> matches = null;
-        try {
-            matches = geoCoder.getFromLocation(target.latitude, target.longitude, 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
-
-        TextView reverseGeocoded = (TextView) findViewById(R.id.reverse_geocoded);
-
-        if ((bestMatch.getLocality() != null) | (bestMatch.getThoroughfare() != null)) {
-            reverseGeocoded.setText(bestMatch.getLocality() + " " + bestMatch.getThoroughfare());  // getLocality(): 시군구, getThoroughfare(): 읍면동|도로명
-        } else {
-            reverseGeocoded.setText("주소를 확인할 수 없습니다.");
-        }
-
-        mMap.clear();
-
-        Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(target.latitude, target.longitude);
-        placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
-            @Override
-            public void onResponse(Call<List<Bathroom>> call, Response<List<Bathroom>> response) {
-                for (Bathroom bathroom : response.body()) {
-                    String id = bathroom.getId();
-                    String title = bathroom.getTitle();
-                    double latitude = bathroom.getLatitude();
-                    double longitude = bathroom.getLongitude();
-
-                    LatLng wc = new LatLng(latitude, longitude);  // 화장실 좌표
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(wc).title(title));  // 화장실 마커 추가
-                    marker.setTag(id);
-                    mMap.setOnMarkerClickListener(MainActivity.this);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Bathroom>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        handler.post(updateMarker);
     }
 
+    @Override
+    public boolean onClusterItemClick(BathroomMarker bathroomMarker) {
+        TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
+        toiletPlace.setText(bathroomMarker.getTitle());
+        this.bathroomMarker = bathroomMarker;
+        return true;
+    }
 
     @Override
     public void onClick(View v) {
@@ -243,31 +290,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
-        toiletPlace.setText(marker.getTitle());
-
-        this.marker = marker;
-        return false;
-    }
-
     @Override
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        String placeID = marker.getTag().toString();
-        int myRating = (int) rbMyRating.getRating();
+        String placeID = bathroomMarker.getId();
+        int myRating = (int) rating;
 
         // 평점 API
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(RatingAPIService.API_URL)
+                .baseUrl(RatingService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
-        RatingAPIService ratingAPIService = retrofit.create(RatingAPIService.class);
+        RatingService ratingService = retrofit.create(RatingService.class);
 
-        ratingAPIService.getSuccess(placeID, myRating).enqueue(new Callback<RatingAPIResponse>() {
+        ratingService.getSuccess(placeID, myRating).enqueue(new Callback<Rating>() {
             @Override
-            public void onResponse(Call<RatingAPIResponse> call, Response<RatingAPIResponse> response) {
+            public void onResponse(Call<Rating> call, Response<Rating> response) {
                 if (!response.body().getSuccess()) {
                     Toast.makeText(MainActivity.this, "평점 등록에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -276,7 +313,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void onFailure(Call<RatingAPIResponse> call, Throwable t) {
+            public void onFailure(Call<Rating> call, Throwable t) {
             }
         });
     }

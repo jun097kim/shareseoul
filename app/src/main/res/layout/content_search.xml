@@ -1,9 +1,10 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment"
-    android:name="kr.or.hanium.mojjak.fragments.SearchHistoryFragment"
+    android:id="@+id/rv_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:layout="@layout/fragment_search_history" />
+    tools:context="kr.or.hanium.mojjak.activities.SearchActivity"
+    tools:showIn="@layout/activity_search" />
