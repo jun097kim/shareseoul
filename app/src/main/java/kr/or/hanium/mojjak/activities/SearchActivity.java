@@ -53,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Search> call, Response<Search> response) {
                         List<Results> resultList = response.body().getResults();
-                        SearchAdapter searchAdapter = new SearchAdapter(resultList);
+                        SearchAdapter searchAdapter = new SearchAdapter(resultList, SearchActivity.this);
                         rvSearch.setAdapter(searchAdapter);
                     }
 

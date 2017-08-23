@@ -58,11 +58,11 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
         public ImageView ivBikesItem;
         public TextView tvBikes;
 
-        public BikesViewHolder(View v) {
-            super(v);
-            cvBikes = v.findViewById(R.id.cv_bikes);
-            ivBikesItem = v.findViewById(R.id.iv_bikes_item);
-            tvBikes = v.findViewById(R.id.tv_bikes);
+        public BikesViewHolder(View view) {
+            super(view);
+            cvBikes = view.findViewById(R.id.cv_bikes);
+            ivBikesItem = view.findViewById(R.id.iv_bikes_item);
+            tvBikes = view.findViewById(R.id.tv_bikes);
         }
     }
 }

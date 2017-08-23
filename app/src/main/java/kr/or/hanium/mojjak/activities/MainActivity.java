@@ -54,13 +54,81 @@ public class MainActivity extends AppCompatActivity
         View.OnClickListener, RatingBar.OnRatingBarChangeListener,
         OnMapReadyCallback, GoogleMap.OnCameraIdleListener, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
 
+    List<BathroomMarker> bathroomMarkers = new ArrayList<>();
+    BathroomMarker bathroomMarker;
+    Handler handler = new Handler();
     private GoogleMap mMap;
     private BathroomsService mBathroomsService;
     private RatingBar rbMyRating;
     private ClusterManager<BathroomMarker> mClusterManager;
     private Set<String> visibleMarkers = new HashSet<>();
-    List<BathroomMarker> bathroomMarkers = new ArrayList<>();
-    BathroomMarker bathroomMarker;
+    Runnable updateMarker = new Runnable() {
+        @Override
+        public void run() {
+            LatLng target = mMap.getCameraPosition().target;  // 현재 보이는 지도의 중심 좌표
+
+            Geocoder geoCoder = new Geocoder(MainActivity.this);  // 좌표 ↔ 주소 변환기
+            List<Address> matches = null;
+            try {
+                matches = geoCoder.getFromLocation(target.latitude, target.longitude, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+            String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
+
+            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
+
+            if (bestMatch != null) {
+                if (bestMatch.getAdminArea() == null) {
+                    tvAddress.setText("");  // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
+                } else if (bestMatch.getAdminArea() != null) {
+                    tvAddress.setText(bestMatch.getLocality() + " ");
+                }
+                for (String s : strings) {
+                    if (s != null) tvAddress.append(s + " ");
+                }
+            } else {
+                tvAddress.setText("주소를 확인할 수 없습니다.");
+            }
+
+            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(target.latitude, target.longitude);
+            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
+                @Override
+                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
+                    for (Bathroom bathroom : response.body()) {
+                        String id = bathroom.getId();
+                        String title = bathroom.getTitle();
+                        double latitude = bathroom.getLatitude();
+                        double longitude = bathroom.getLongitude();
+
+                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
+                    }
+
+                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                    for (final BathroomMarker item : bathroomMarkers) {
+                        if (bounds.contains(item.getPosition())) {
+                            if (!visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.add(item.getId());
+                                mClusterManager.addItem(item);
+                            }
+                        } else {
+                            if (visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.remove(item.getId());
+                                mClusterManager.removeItem(item);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            mClusterManager.cluster();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,75 +235,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    Handler handler = new Handler();
-    Runnable updateMarker = new Runnable() {
-        @Override
-        public void run() {
-            LatLng target = mMap.getCameraPosition().target;  // 현재 보이는 지도의 중심 좌표
-
-            Geocoder geoCoder = new Geocoder(MainActivity.this);  // 좌표 ↔ 주소 변환기
-            List<Address> matches = null;
-            try {
-                matches = geoCoder.getFromLocation(target.latitude, target.longitude, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
-            String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
-
-            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
-
-            if (bestMatch != null) {
-                if (bestMatch.getAdminArea() == null) {
-                    tvAddress.setText("");  // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
-                } else if (bestMatch.getAdminArea() != null) {
-                    tvAddress.setText(bestMatch.getLocality() + " ");
-                }
-                for (String s : strings) {
-                    if (s != null) tvAddress.append(s + " ");
-                }
-            } else {
-                tvAddress.setText("주소를 확인할 수 없습니다.");
-            }
-
-            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(target.latitude, target.longitude);
-            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
-                @Override
-                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
-                    for (Bathroom bathroom : response.body()) {
-                        String id = bathroom.getId();
-                        String title = bathroom.getTitle();
-                        double latitude = bathroom.getLatitude();
-                        double longitude = bathroom.getLongitude();
-
-                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
-                    }
-
-                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                    for (final BathroomMarker item : bathroomMarkers) {
-                        if (bounds.contains(item.getPosition())) {
-                            if (!visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.add(item.getId());
-                                mClusterManager.addItem(item);
-                            }
-                        } else {
-                            if (visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.remove(item.getId());
-                                mClusterManager.removeItem(item);
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
-                }
-            });
-            mClusterManager.cluster();
-        }
-    };
-
     // 구글 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
 
     // 지도를 사용할 준비가 되면 호출
@@ -314,6 +313,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<Rating> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
             }
         });
     }

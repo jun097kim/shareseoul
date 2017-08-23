@@ -62,8 +62,8 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
         public RestaurantsViewHolder(View view) {
             super(view);
-            mImageView = (ImageView) view.findViewById(R.id.food_img);
-            mTextView = (TextView) view.findViewById(R.id.food_title);
+            mImageView = view.findViewById(R.id.food_img);
+            mTextView = view.findViewById(R.id.food_title);
             ivRating = view.findViewById(R.id.iv_rating);
         }
     }

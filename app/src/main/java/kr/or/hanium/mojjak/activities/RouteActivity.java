@@ -15,11 +15,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import kr.or.hanium.mojjak.interfaces.DirectionsService;
 import kr.or.hanium.mojjak.R;
-import kr.or.hanium.mojjak.models.Route;
 import kr.or.hanium.mojjak.adapters.RoutesAdapter;
+import kr.or.hanium.mojjak.interfaces.DirectionsService;
 import kr.or.hanium.mojjak.models.Direction;
+import kr.or.hanium.mojjak.models.Route;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,16 +28,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RouteActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final int REQUEST_CODE_ORIGIN = 0;
+    private static final int REQUEST_CODE_DESTINATION = 1;
     private DirectionsService mDirectionsService;
     private RecyclerView mRouteRecyclerView;
     private ArrayList<Route> mRouteList = new ArrayList<>();
     private RoutesAdapter mRoutesAdapter;
     private TextView mOrigin;
     private TextView mDestination;
-
-    private static final int REQUEST_CODE_ORIGIN = 0;
-    private static final int REQUEST_CODE_DESTINATION = 2;
-
     private ArrayList<String> durationList = new ArrayList<>(); // 총 걸리는 시간
     private ArrayList<Integer> walkingDurationList = new ArrayList<>(); // 총 도보 시간
 
@@ -141,7 +139,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         mRouteList.clear();
         mRoutesAdapter.notifyItemRangeRemoved(0, size);
 
-        mDirectionsService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "ko", "AIzaSyCaZwAmlCPR6PtvluVU1AVuC8B0b8JkKak").enqueue(new Callback<Direction>() {
+        Call<Direction> directionCall = mDirectionsService.getDirections(mOrigin.getText().toString(), mDestination.getText().toString(), "transit", "ko", getString(R.string.google_api_key));
+        directionCall.enqueue(new Callback<Direction>() {
             @Override
             public void onResponse(Call<Direction> call, Response<Direction> response) {
 
@@ -218,16 +217,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<Direction> call, Throwable t) {
-
+                Toast.makeText(RouteActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
             }
         });
     }
-/*
-    private class CustmoAdqpter extends ArrayList<String> {
-        Context context;
-
-        public CustmoAdqpter(Context context) {
-            super(context, R.layout.fragment_route_list, )
-        }
-    }*/
 }

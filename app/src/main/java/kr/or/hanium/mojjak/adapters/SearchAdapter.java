@@ -1,5 +1,8 @@
 package kr.or.hanium.mojjak.adapters;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,25 +12,37 @@ import android.widget.TextView;
 import java.util.List;
 
 import kr.or.hanium.mojjak.R;
+import kr.or.hanium.mojjak.activities.RouteActivity;
 import kr.or.hanium.mojjak.models.Search.Results;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
     List<Results> resultsList;
+    Activity activity;
 
-    public SearchAdapter(List<Results> resultsList) {
+    public SearchAdapter(List<Results> resultsList, Activity activity) {
         this.resultsList = resultsList;
+        this.activity = activity;
     }
 
     @Override
     public SearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_search, parent, false);
-        SearchViewHolder searchViewHolder = new SearchViewHolder(view);
+        SearchViewHolder searchViewHolder = new SearchViewHolder(view, activity);
         return searchViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(SearchViewHolder holder, int position) {
+    public void onBindViewHolder(SearchViewHolder holder, final int position) {
         holder.tvSearch.setText(resultsList.get(position).getName());
+        holder.cvSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, RouteActivity.class);
+                intent.putExtra("result", resultsList.get(position).getName());
+                activity.setResult(Activity.RESULT_OK, intent);
+                activity.finish();
+            }
+        });
     }
 
     @Override
@@ -37,10 +52,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
     public static class SearchViewHolder extends RecyclerView.ViewHolder {
         TextView tvSearch;
+        CardView cvSearch;
+        Activity activity;
 
-        public SearchViewHolder(View itemView) {
-            super(itemView);
+        public SearchViewHolder(View view, Activity activity) {
+            super(view);
             tvSearch = itemView.findViewById(R.id.tv_search);
+            cvSearch = itemView.findViewById(R.id.cv_search);
+            this.activity = activity;
         }
     }
 }
