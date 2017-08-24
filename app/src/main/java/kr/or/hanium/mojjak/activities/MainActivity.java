@@ -1,5 +1,6 @@
 package kr.or.hanium.mojjak.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -25,9 +26,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(latitude, longitude);
+            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(bestMatch.getLatitude(), bestMatch.getLongitude());
             placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
                 @Override
                 public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     }
+                    mClusterManager.cluster();  // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
                 }
 
                 @Override
@@ -135,7 +140,6 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
                 }
             });
-            mClusterManager.cluster();
         }
     };
     private BathroomMarker bathroomMarker;  // 클릭한 마커
@@ -262,6 +266,7 @@ public class MainActivity extends AppCompatActivity
         mClusterManager = new ClusterManager<>(this, mMap);
 
         mClusterManager.setOnClusterItemClickListener(this);
+        mClusterManager.setRenderer(new BathroomRenderer(this, mMap, mClusterManager));
 
         // 카메라 이동이 끝났을 때, 한 번만 호출
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
@@ -270,8 +275,6 @@ public class MainActivity extends AppCompatActivity
                 handler.post(updateMarker);
             }
         });
-
-        mMap.setOnMarkerClickListener(mClusterManager);
     }
 
     @Override
@@ -283,19 +286,49 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        String placeId = bathroomMarker.getId();
+        int myRating = (int) rating;
+
+        if (userId != 0) {
+            // 평점 API
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(RatingService.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                    .build();
+            RatingService ratingService = retrofit.create(RatingService.class);
+
+            ratingService.getSuccess(userId, placeId, myRating).enqueue(new Callback<Rating>() {
+                @Override
+                public void onResponse(Call<Rating> call, Response<Rating> response) {
+                    if (response.body().getSuccess()) {
+                        Toast.makeText(MainActivity.this, "평점이 등록되었습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Rating> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "로그인 후 이용 가능합니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         Intent intent = null;
-
         switch (v.getId()) {
             case R.id.fab_pick:
                 intent = new Intent(this, PickActivity.class);
                 break;
-
             case R.id.btn_search:
                 intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("searchType", "normal");
                 break;
-
             case R.id.nav_login:
                 intent = new Intent(this, LoginActivity.class);
         }
@@ -303,33 +336,17 @@ public class MainActivity extends AppCompatActivity
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
     }
 
-    @Override
-    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        String placeID = bathroomMarker.getId();
-        int myRating = (int) rating;
-        Toast.makeText(this, placeID + "내 평점" + myRating, Toast.LENGTH_SHORT).show();
+    class BathroomRenderer extends DefaultClusterRenderer<BathroomMarker> {
+        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<BathroomMarker> clusterManager) {
+            super(context, map, clusterManager);
+        }
 
-        // 평점 API
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(RatingService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
-                .build();
-        RatingService ratingService = retrofit.create(RatingService.class);
-
-        ratingService.getSuccess(userId, placeID, myRating).enqueue(new Callback<Rating>() {
-            @Override
-            public void onResponse(Call<Rating> call, Response<Rating> response) {
-                if (response.body().getSuccess()) {
-                    Toast.makeText(MainActivity.this, "평점이 등록되었습니다.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Rating> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        @Override
+        protected void onBeforeClusterItemRendered(BathroomMarker item, MarkerOptions markerOptions) {
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.bike_marker));
+            markerOptions.snippet(item.getSnippet());
+            markerOptions.title(item.getTitle());
+            super.onBeforeClusterItemRendered(item, markerOptions);
+        }
     }
 }
