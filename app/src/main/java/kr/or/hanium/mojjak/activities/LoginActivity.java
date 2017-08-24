@@ -11,9 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import kr.or.hanium.mojjak.models.Login;
-import kr.or.hanium.mojjak.interfaces.LoginService;
 import kr.or.hanium.mojjak.R;
+import kr.or.hanium.mojjak.interfaces.LoginService;
+import kr.or.hanium.mojjak.models.Login;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,10 +68,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             loginService.getLogin(email, password).enqueue(new Callback<Login>() {
                 @Override
                 public void onResponse(Call<Login> call, Response<Login> response) {
-                    if (response.body().getResult()) {
+                    Login login = response.body();
+                    if (login.getResult()) {
                         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = pref.edit();
-                        editor.putInt("id", 3);
+                        editor.putInt("userId", login.getId());
                         editor.putString("email", email);
                         editor.commit();
 
@@ -84,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 @Override
                 public void onFailure(Call<Login> call, Throwable t) {
-
+                    Toast.makeText(LoginActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
                 }
             });
         }

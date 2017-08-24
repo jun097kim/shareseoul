@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -60,6 +61,7 @@ public class RestaurantsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Restaurant> call, Throwable t) {
+                Toast.makeText(RestaurantsActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
             }
         });
     }

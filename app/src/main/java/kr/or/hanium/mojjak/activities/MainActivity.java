@@ -52,11 +52,13 @@ import static kr.or.hanium.mojjak.R.id.map;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener, RatingBar.OnRatingBarChangeListener,
-        OnMapReadyCallback, GoogleMap.OnCameraIdleListener, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
+        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
 
     List<BathroomMarker> bathroomMarkers = new ArrayList<>();
     BathroomMarker bathroomMarker;
     Handler handler = new Handler();
+    int userId;
+    String email;
     private GoogleMap mMap;
     private BathroomsService mBathroomsService;
     private RatingBar rbMyRating;
@@ -166,7 +168,8 @@ public class MainActivity extends AppCompatActivity
         // 로그인되어 있는지 확인
         TextView tvEmail = headerView.findViewById(R.id.tv_email);
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        String email = pref.getString("email", "");
+        userId = pref.getInt("userId", 0);
+        email = pref.getString("email", "");
         if (!TextUtils.isEmpty(email)) {
             tvEmail.setText(email);
 //            navLogin.setOnClickListener(null);
@@ -248,15 +251,18 @@ public class MainActivity extends AppCompatActivity
 
         // 클러스터 매니저 생성
         mClusterManager = new ClusterManager<>(this, mMap);
-        mClusterManager.setOnClusterItemClickListener(this);
-        mMap.setOnCameraIdleListener(this);
-        mMap.setOnMarkerClickListener(mClusterManager);
-    }
 
-    // 카메라 이동이 끝났을 때, 한 번만 호출
-    @Override
-    public void onCameraIdle() {
-        handler.post(updateMarker);
+        mClusterManager.setOnClusterItemClickListener(this);
+
+        // 카메라 이동이 끝났을 때, 한 번만 호출
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                handler.post(updateMarker);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(mClusterManager);
     }
 
     @Override
@@ -264,7 +270,7 @@ public class MainActivity extends AppCompatActivity
         TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
         toiletPlace.setText(bathroomMarker.getTitle());
         this.bathroomMarker = bathroomMarker;
-        return true;
+        return false;
     }
 
     @Override
@@ -293,6 +299,7 @@ public class MainActivity extends AppCompatActivity
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
         String placeID = bathroomMarker.getId();
         int myRating = (int) rating;
+        Toast.makeText(this, placeID + "내 평점" + myRating, Toast.LENGTH_SHORT).show();
 
         // 평점 API
         Retrofit retrofit = new Retrofit.Builder()
@@ -301,13 +308,13 @@ public class MainActivity extends AppCompatActivity
                 .build();
         RatingService ratingService = retrofit.create(RatingService.class);
 
-        ratingService.getSuccess(placeID, myRating).enqueue(new Callback<Rating>() {
+        ratingService.getSuccess(userId, placeID, myRating).enqueue(new Callback<Rating>() {
             @Override
             public void onResponse(Call<Rating> call, Response<Rating> response) {
-                if (!response.body().getSuccess()) {
-                    Toast.makeText(MainActivity.this, "평점 등록에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                if (response.body().getSuccess()) {
+                    Toast.makeText(MainActivity.this, "평점이 등록되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "평점 등록에 성공했습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
                 }
             }
 

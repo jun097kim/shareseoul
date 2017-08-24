@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
@@ -59,7 +60,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<Search> call, Throwable t) {
-
+                        Toast.makeText(SearchActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
                 return true;

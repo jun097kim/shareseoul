@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class BikesActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Bike>> call, Throwable t) {
+                Toast.makeText(BikesActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
             }
         });
     }

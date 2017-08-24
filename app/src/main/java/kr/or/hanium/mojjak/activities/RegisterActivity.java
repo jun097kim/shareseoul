@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import kr.or.hanium.mojjak.R;
-import kr.or.hanium.mojjak.models.Register;
 import kr.or.hanium.mojjak.interfaces.RegisterService;
+import kr.or.hanium.mojjak.models.Register;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                 @Override
                 public void onFailure(Call<Register> call, Throwable t) {
-
+                    Toast.makeText(RegisterActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
                 }
             });
         }

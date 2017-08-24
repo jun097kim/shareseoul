@@ -11,5 +11,10 @@ public interface RatingService {
 
     @FormUrlEncoded
     @POST("rating_proc.jsp")
-    Call<Rating> getSuccess(@Field("place_id") String placeID, @Field("my_rating") int myRating);
+    Call<Rating> getSuccess(@Field("user_id")
+                                    int userId,
+                            @Field("place_id")
+                                    String placeId,
+                            @Field("my_rating")
+                                    int myRating);
 }
