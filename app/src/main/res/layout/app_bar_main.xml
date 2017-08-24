@@ -17,7 +17,7 @@
             android:background="@color/colorPrimary">
 
             <TextView
-                android:id="@+id/search_btn"
+                android:id="@+id/btn_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="장소, 버스, 지하철 검색"
@@ -158,15 +158,14 @@
     </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_pick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorPrimary"
-        android:tint="@color/colorAccent"
         app:borderWidth="0dp"
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
-        app:srcCompat="@drawable/ic_fab_wc"
+        app:srcCompat="@drawable/ic_fab_pick"
         app:useCompatPadding="true" />
     <!--
     tint: 아이콘 색상

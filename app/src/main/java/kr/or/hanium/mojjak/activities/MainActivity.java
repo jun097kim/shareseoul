@@ -54,47 +54,54 @@ public class MainActivity extends AppCompatActivity
         View.OnClickListener, RatingBar.OnRatingBarChangeListener,
         OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
 
-    List<BathroomMarker> bathroomMarkers = new ArrayList<>();
-    BathroomMarker bathroomMarker;
-    Handler handler = new Handler();
-    int userId;
-    String email;
+    private int userId;
+    private String userEmail;
+
     private GoogleMap mMap;
+
     private BathroomsService mBathroomsService;
-    private RatingBar rbMyRating;
+
     private ClusterManager<BathroomMarker> mClusterManager;
+    private Handler handler = new Handler();
+    private List<BathroomMarker> bathroomMarkers = new ArrayList<>();
     private Set<String> visibleMarkers = new HashSet<>();
     Runnable updateMarker = new Runnable() {
         @Override
         public void run() {
-            LatLng target = mMap.getCameraPosition().target;  // 현재 보이는 지도의 중심 좌표
+            LatLng target = mMap.getCameraPosition().target;    // 현재 보이는 지도의 중심 좌표
+            double latitude = target.latitude;
+            double longitude = target.longitude;
 
-            Geocoder geoCoder = new Geocoder(MainActivity.this);  // 좌표 ↔ 주소 변환기
+            Geocoder geoCoder = new Geocoder(MainActivity.this);    // 좌표 ↔ 주소 변환기
             List<Address> matches = null;
             try {
-                matches = geoCoder.getFromLocation(target.latitude, target.longitude, 1);
+                matches = geoCoder.getFromLocation(latitude, longitude, 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
-            String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
+            Address bestMatch = (matches == null) ? null : matches.get(0);
 
             TextView tvAddress = (TextView) findViewById(R.id.tv_address);
 
             if (bestMatch != null) {
+                String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
+
                 if (bestMatch.getAdminArea() == null) {
                     tvAddress.setText("");  // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
                 } else if (bestMatch.getAdminArea() != null) {
                     tvAddress.setText(bestMatch.getLocality() + " ");
                 }
+
                 for (String s : strings) {
                     if (s != null) tvAddress.append(s + " ");
                 }
+
             } else {
                 tvAddress.setText("주소를 확인할 수 없습니다.");
             }
 
-            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(target.latitude, target.longitude);
+
+            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(latitude, longitude);
             placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
                 @Override
                 public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
@@ -131,6 +138,8 @@ public class MainActivity extends AppCompatActivity
             mClusterManager.cluster();
         }
     };
+    private BathroomMarker bathroomMarker;  // 클릭한 마커
+    private RatingBar rbMyRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,10 +149,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        TextView searchBtn = (TextView) findViewById(R.id.search_btn);
+        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
+        TextView searchBtn = (TextView) findViewById(R.id.btn_search);
 
-        fab.setOnClickListener(this);
+        fabPick.setOnClickListener(this);
         searchBtn.setOnClickListener(this);
 
         rbMyRating = (RatingBar) findViewById(R.id.my_rating);
@@ -169,9 +178,9 @@ public class MainActivity extends AppCompatActivity
         TextView tvEmail = headerView.findViewById(R.id.tv_email);
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         userId = pref.getInt("userId", 0);
-        email = pref.getString("email", "");
-        if (!TextUtils.isEmpty(email)) {
-            tvEmail.setText(email);
+        userEmail = pref.getString("userEmail", "");
+        if (!TextUtils.isEmpty(userEmail)) {
+            tvEmail.setText(userEmail);
 //            navLogin.setOnClickListener(null);
         }
 
@@ -185,7 +194,7 @@ public class MainActivity extends AppCompatActivity
         // 화장실 API
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BathroomsService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())  // JSON Converter 지정
+                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
                 .build();
         mBathroomsService = retrofit.create(BathroomsService.class);
     }
@@ -200,6 +209,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // 구글 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -212,7 +223,7 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra("searchType", "normal");
             startActivity(intent);
 
-            overridePendingTransition(0, 0);// 전환 애니메이션 없애기
+            overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
         }
         // 길찾기 메뉴를 눌렀을 때, RouteActivity 호출
         else if (id == R.id.nav_route) {
@@ -220,7 +231,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             overridePendingTransition(0, 0);
         }
-        // 맛집 메뉴를 눌렀을 때, BikesActivity 호출
+        // 맛집 메뉴를 눌렀을 때, RestaurantsActivity 호출
         else if (id == R.id.nav_restaurants) {
             Intent intent = new Intent(this, RestaurantsActivity.class);
             startActivity(intent);
@@ -238,16 +249,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    // 구글 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
-
     // 지도를 사용할 준비가 되면 호출
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng seoul = new LatLng(37.56, 126.97);  // Lat(Latitude): 위도, Lng(Longitude): 경도
+        LatLng seoul = new LatLng(37.56, 126.97);   // Lat(Latitude): 위도, Lng(Longitude): 경도
         mMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));  // 서울로 카메라 이동
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));  // 줌 레벨 16으로 설정
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(16)); // 줌 레벨 16으로 설정
 
         // 클러스터 매니저 생성
         mClusterManager = new ClusterManager<>(this, mMap);
@@ -275,24 +284,23 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        Intent intent;
+        Intent intent = null;
 
         switch (v.getId()) {
-            case R.id.fab:
+            case R.id.fab_pick:
+                intent = new Intent(this, PickActivity.class);
                 break;
 
-            case R.id.search_btn:
+            case R.id.btn_search:
                 intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("searchType", "normal");
-                startActivity(intent);
-                overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
                 break;
 
             case R.id.nav_login:
                 intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
         }
+        startActivity(intent);
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
     }
 
     @Override

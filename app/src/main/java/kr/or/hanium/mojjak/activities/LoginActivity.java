@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = pref.edit();
                         editor.putInt("userId", login.getId());
-                        editor.putString("email", email);
+                        editor.putString("userEmail", email);
                         editor.commit();
 
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
