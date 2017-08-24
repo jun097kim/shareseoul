@@ -29,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -69,79 +70,7 @@ public class MainActivity extends AppCompatActivity
     private Handler handler = new Handler();
     private List<BathroomMarker> bathroomMarkers = new ArrayList<>();
     private Set<String> visibleMarkers = new HashSet<>();
-    Runnable updateMarker = new Runnable() {
-        @Override
-        public void run() {
-            LatLng target = mMap.getCameraPosition().target;    // 현재 보이는 지도의 중심 좌표
-            double latitude = target.latitude;
-            double longitude = target.longitude;
 
-            Geocoder geoCoder = new Geocoder(MainActivity.this);    // 좌표 ↔ 주소 변환기
-            List<Address> matches = null;
-            try {
-                matches = geoCoder.getFromLocation(latitude, longitude, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Address bestMatch = (matches == null) ? null : matches.get(0);
-
-            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
-
-            if (bestMatch != null) {
-                String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
-
-                if (bestMatch.getAdminArea() == null) {
-                    tvAddress.setText("");  // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
-                } else if (bestMatch.getAdminArea() != null) {
-                    tvAddress.setText(bestMatch.getLocality() + " ");
-                }
-
-                for (String s : strings) {
-                    if (s != null) tvAddress.append(s + " ");
-                }
-
-            } else {
-                tvAddress.setText("주소를 확인할 수 없습니다.");
-            }
-
-
-            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(bestMatch.getLatitude(), bestMatch.getLongitude());
-            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
-                @Override
-                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
-                    for (Bathroom bathroom : response.body()) {
-                        String id = bathroom.getId();
-                        String title = bathroom.getTitle();
-                        double latitude = bathroom.getLatitude();
-                        double longitude = bathroom.getLongitude();
-
-                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
-                    }
-
-                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                    for (final BathroomMarker item : bathroomMarkers) {
-                        if (bounds.contains(item.getPosition())) {
-                            if (!visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.add(item.getId());
-                                mClusterManager.addItem(item);
-                            }
-                        } else {
-                            if (visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.remove(item.getId());
-                                mClusterManager.removeItem(item);
-                            }
-                        }
-                    }
-                    mClusterManager.cluster();  // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
-                }
-
-                @Override
-                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    };
     private BathroomMarker bathroomMarker;  // 클릭한 마커
     private RatingBar rbMyRating;
 
@@ -151,7 +80,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
         TextView searchBtn = (TextView) findViewById(R.id.btn_search);
@@ -188,7 +116,6 @@ public class MainActivity extends AppCompatActivity
 //            navLogin.setOnClickListener(null);
         }
 
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
@@ -213,40 +140,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // 구글 지도 API 이벤트가 발생했을 때, 호출되는 콜백 함수들
-
+    // 네비게이션 메뉴 아이템을 눌렀을 때 호출
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Intent intent = null;
 
-        // 검색 메뉴를 눌렀을 때, SearchActivity 호출
+        // 아이템에 해당하는 액티비티로 전환
         if (id == R.id.nav_search) {
-            Intent intent = new Intent(this, SearchActivity.class);
+            intent = new Intent(this, SearchActivity.class);
             intent.putExtra("searchType", "normal");
-            startActivity(intent);
-
-            overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
         }
-        // 길찾기 메뉴를 눌렀을 때, RouteActivity 호출
         else if (id == R.id.nav_route) {
-            Intent intent = new Intent(this, RouteActivity.class);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
+            intent = new Intent(this, RouteActivity.class);
         }
-        // 맛집 메뉴를 눌렀을 때, RestaurantsActivity 호출
         else if (id == R.id.nav_restaurants) {
-            Intent intent = new Intent(this, RestaurantsActivity.class);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
+            intent = new Intent(this, RestaurantsActivity.class);
         }
-        // 따릉이 대여소 메뉴를 눌렀을 때, BikesActivity 호출
         else if (id == R.id.nav_bikes) {
-            Intent intent = new Intent(this, BikesActivity.class);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
+            intent = new Intent(this, BikesActivity.class);
         }
+        startActivity(intent);
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -260,7 +177,7 @@ public class MainActivity extends AppCompatActivity
 
         LatLng seoul = new LatLng(37.56, 126.97);   // Lat(Latitude): 위도, Lng(Longitude): 경도
         mMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));  // 서울로 카메라 이동
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16)); // 줌 레벨 16으로 설정
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); // 줌 레벨 15으로 설정
 
         // 클러스터 매니저 생성
         mClusterManager = new ClusterManager<>(this, mMap);
@@ -275,14 +192,116 @@ public class MainActivity extends AppCompatActivity
                 handler.post(updateMarker);
             }
         });
+
+        mMap.setOnMarkerClickListener(mClusterManager);
     }
+
+    class BathroomRenderer extends DefaultClusterRenderer<BathroomMarker> {
+        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<BathroomMarker> clusterManager) {
+            super(context, map, clusterManager);
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(BathroomMarker item, MarkerOptions markerOptions) {
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.bike_marker));
+            markerOptions.snippet(item.getSnippet());
+            markerOptions.title(item.getTitle());
+            super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+    }
+
+    Runnable updateMarker = new Runnable() {
+        @Override
+        public void run() {
+            // 현재 보이는 지도의 중심 좌표
+            LatLng target = mMap.getCameraPosition().target;
+            double latitude = target.latitude;
+            double longitude = target.longitude;
+
+            // 좌표를 주소로 변환
+            Geocoder geoCoder = new Geocoder(MainActivity.this);
+            List<Address> matches = null;
+            try {
+                matches = geoCoder.getFromLocation(latitude, longitude, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address bestMatch = (matches == null) ? null : matches.get(0);
+
+            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
+
+            if (bestMatch != null) {
+                // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
+                String[] strings = {bestMatch.getSubLocality(), bestMatch.getThoroughfare()};
+
+                if (bestMatch.getAdminArea() == null) {
+                    tvAddress.setText("");
+                } else if (bestMatch.getAdminArea() != null) {
+                    tvAddress.setText(bestMatch.getLocality() + " ");
+                }
+
+                for (String s : strings) {
+                    if (s != null) tvAddress.append(s + " ");
+                }
+
+            } else {
+                tvAddress.setText("주소를 확인할 수 없습니다.");
+            }
+
+            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(latitude, longitude);
+            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
+                @Override
+                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
+                    for (Bathroom bathroom : response.body()) {
+                        String id = bathroom.getId();
+                        String title = bathroom.getTitle();
+                        double latitude = bathroom.getLatitude();
+                        double longitude = bathroom.getLongitude();
+
+                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
+                    }
+
+                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                    for (final BathroomMarker item : bathroomMarkers) {
+                        if (bounds.contains(item.getPosition())) {
+                            if (!visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.add(item.getId());
+                                mClusterManager.addItem(item);
+                            }
+                        } else {
+                            if (visibleMarkers.contains(item.getId())) {
+                                visibleMarkers.remove(item.getId());
+                                mClusterManager.removeItem(item);
+                            }
+                        }
+                    }
+
+                    // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
+                    mClusterManager.cluster();
+                }
+
+                @Override
+                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    };
 
     @Override
     public boolean onClusterItemClick(BathroomMarker bathroomMarker) {
         TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
         toiletPlace.setText(bathroomMarker.getTitle());
         this.bathroomMarker = bathroomMarker;
-        return false;
+
+        // 마커를 눌렀을 때 가운데로 이동되지 않게 함
+        for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
+            if (marker.getPosition().latitude == bathroomMarker.getPosition().latitude &&
+                    marker.getPosition().longitude == bathroomMarker.getPosition().longitude) {
+                marker.showInfoWindow();
+            }
+        }
+        return true;
     }
 
     @Override
@@ -334,19 +353,5 @@ public class MainActivity extends AppCompatActivity
         }
         startActivity(intent);
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
-    }
-
-    class BathroomRenderer extends DefaultClusterRenderer<BathroomMarker> {
-        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<BathroomMarker> clusterManager) {
-            super(context, map, clusterManager);
-        }
-
-        @Override
-        protected void onBeforeClusterItemRendered(BathroomMarker item, MarkerOptions markerOptions) {
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.bike_marker));
-            markerOptions.snippet(item.getSnippet());
-            markerOptions.title(item.getTitle());
-            super.onBeforeClusterItemRendered(item, markerOptions);
-        }
     }
 }
