@@ -250,6 +250,9 @@ public class MainActivity extends AppCompatActivity
                     if (s != null) tvAddress.append(s + " ");
                 }
 
+/*                tvAddress.setText(bestMatch.getAddressLine(0)
+                        .replaceFirst("[가-힣 ]+" + bestMatch.getLocality() + " ", "")
+                        .replaceFirst(" " + bestMatch.getFeatureName(), ""));*/
             } else {
                 tvAddress.setText("주소를 확인할 수 없습니다.");
             }
@@ -319,11 +322,14 @@ public class MainActivity extends AppCompatActivity
         }
         Address bestMatch = (matches == null) ? null : matches.get(0);
 
+        // 주소에서 국가 이름 제거
+        String address = bestMatch.getAddressLine(0).replaceFirst(bestMatch.getCountryName() + " ", "");
+
         PlaceFragment placeFragment = new PlaceFragment();
         Bundle args = new Bundle();
         args.putString("title", bathroomMarker.getTitle());
         args.putString("placeId", bathroomMarker.getId());
-        args.putString("address", bestMatch.getAddressLine(0));
+        args.putString("address", address);
         placeFragment.setArguments(args);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
