@@ -13,9 +13,6 @@
         <item
             android:id="@+id/nav_restaurants"
             android:title="맛집" />
-        <item
-            android:id="@+id/nav_bikes"
-            android:title="따릉이 대여소" />
     </group>
 
 </menu>

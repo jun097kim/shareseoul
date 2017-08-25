@@ -29,6 +29,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
+
         Button btnRegister = (Button) findViewById(R.id.btn_register);
         btnRegister.setOnClickListener(this);
     }

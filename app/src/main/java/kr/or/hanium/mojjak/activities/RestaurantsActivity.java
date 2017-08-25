@@ -31,6 +31,8 @@ public class RestaurantsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
         initViews();
     }
 

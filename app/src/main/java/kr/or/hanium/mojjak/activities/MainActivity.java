@@ -7,17 +7,21 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RatingBar;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,10 +30,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -42,10 +44,8 @@ import java.util.Set;
 
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.interfaces.BathroomsService;
-import kr.or.hanium.mojjak.interfaces.RatingService;
 import kr.or.hanium.mojjak.models.Bathroom;
 import kr.or.hanium.mojjak.models.BathroomMarker;
-import kr.or.hanium.mojjak.models.Rating;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,11 +55,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static kr.or.hanium.mojjak.R.id.map;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        View.OnClickListener, RatingBar.OnRatingBarChangeListener,
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
         OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
 
-    private int userId;
     private String userEmail;
 
     private GoogleMap mMap;
@@ -72,7 +70,6 @@ public class MainActivity extends AppCompatActivity
     private Set<String> visibleMarkers = new HashSet<>();
 
     private BathroomMarker bathroomMarker;  // 클릭한 마커
-    private RatingBar rbMyRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,15 +78,17 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
-        TextView searchBtn = (TextView) findViewById(R.id.btn_search);
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
-        fabPick.setOnClickListener(this);
-        searchBtn.setOnClickListener(this);
+        AddressFragment addressFragment = new AddressFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, addressFragment).commit();
 
-        rbMyRating = (RatingBar) findViewById(R.id.my_rating);
-        rbMyRating.setOnRatingBarChangeListener(this);
+//        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
+        TextView tvSearch = (TextView) findViewById(R.id.tv_search);
 
+//        fabPick.setOnClickListener(this);
+        tvSearch.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -109,7 +108,6 @@ public class MainActivity extends AppCompatActivity
         // 로그인되어 있는지 확인
         TextView tvEmail = headerView.findViewById(R.id.tv_email);
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        userId = pref.getInt("userId", 0);
         userEmail = pref.getString("userEmail", "");
         if (!TextUtils.isEmpty(userEmail)) {
             tvEmail.setText(userEmail);
@@ -152,18 +150,12 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_search) {
             intent = new Intent(this, SearchActivity.class);
             intent.putExtra("searchType", "normal");
-        }
-        else if (id == R.id.nav_route) {
+        } else if (id == R.id.nav_route) {
             intent = new Intent(this, RouteActivity.class);
-        }
-        else if (id == R.id.nav_restaurants) {
+        } else if (id == R.id.nav_restaurants) {
             intent = new Intent(this, RestaurantsActivity.class);
         }
-        else if (id == R.id.nav_bikes) {
-            intent = new Intent(this, BikesActivity.class);
-        }
         startActivity(intent);
-        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -185,11 +177,26 @@ public class MainActivity extends AppCompatActivity
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setRenderer(new BathroomRenderer(this, mMap, mClusterManager));
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                bathroomMarker = null;
+
+                AddressFragment addressFragment = new AddressFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, addressFragment);
+                transaction.commit();
+
+                handler.post(updateAddress);
+            }
+        });
+
         // 카메라 이동이 끝났을 때, 한 번만 호출
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
                 handler.post(updateMarker);
+                if (bathroomMarker == null) handler.post(updateAddress);
             }
         });
 
@@ -203,32 +210,31 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onBeforeClusterItemRendered(BathroomMarker item, MarkerOptions markerOptions) {
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.bike_marker));
+            markerOptions.icon(item.getImage());
             markerOptions.snippet(item.getSnippet());
             markerOptions.title(item.getTitle());
             super.onBeforeClusterItemRendered(item, markerOptions);
         }
     }
 
-    Runnable updateMarker = new Runnable() {
+    Runnable updateAddress = new Runnable() {
         @Override
         public void run() {
-            // 현재 보이는 지도의 중심 좌표
             LatLng target = mMap.getCameraPosition().target;
             double latitude = target.latitude;
             double longitude = target.longitude;
 
             // 좌표를 주소로 변환
-            Geocoder geoCoder = new Geocoder(MainActivity.this);
+            Geocoder geocoder = new Geocoder(MainActivity.this);
             List<Address> matches = null;
             try {
-                matches = geoCoder.getFromLocation(latitude, longitude, 1);
+                matches = geocoder.getFromLocation(latitude, longitude, 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             Address bestMatch = (matches == null) ? null : matches.get(0);
 
-            TextView tvAddress = (TextView) findViewById(R.id.tv_address);
+            TextView tvAddress = (TextView) findViewById(R.id.tv_place);
 
             if (bestMatch != null) {
                 // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
@@ -247,6 +253,16 @@ public class MainActivity extends AppCompatActivity
             } else {
                 tvAddress.setText("주소를 확인할 수 없습니다.");
             }
+        }
+    };
+
+    Runnable updateMarker = new Runnable() {
+        @Override
+        public void run() {
+            // 현재 보이는 지도의 중심 좌표
+            LatLng target = mMap.getCameraPosition().target;
+            double latitude = target.latitude;
+            double longitude = target.longitude;
 
             Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(latitude, longitude);
             placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
@@ -290,68 +306,94 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onClusterItemClick(BathroomMarker bathroomMarker) {
-        TextView toiletPlace = (TextView) findViewById(R.id.toilet_place);
-        toiletPlace.setText(bathroomMarker.getTitle());
         this.bathroomMarker = bathroomMarker;
 
+        LatLng position = bathroomMarker.getPosition();
+        Geocoder geocoder = new Geocoder(this);
+
+        List<Address> matches = null;
+        try {
+            matches = geocoder.getFromLocation(position.latitude, position.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address bestMatch = (matches == null) ? null : matches.get(0);
+
+        PlaceFragment placeFragment = new PlaceFragment();
+        Bundle args = new Bundle();
+        args.putString("title", bathroomMarker.getTitle());
+        args.putString("placeId", bathroomMarker.getId());
+        args.putString("address", bestMatch.getAddressLine(0));
+        placeFragment.setArguments(args);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, placeFragment);
+        transaction.commit();
+
         // 마커를 눌렀을 때 가운데로 이동되지 않게 함
-        for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
+        /*for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
             if (marker.getPosition().latitude == bathroomMarker.getPosition().latitude &&
                     marker.getPosition().longitude == bathroomMarker.getPosition().longitude) {
                 marker.showInfoWindow();
             }
-        }
+        }*/
         return true;
-    }
-
-    @Override
-    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        String placeId = bathroomMarker.getId();
-        int myRating = (int) rating;
-
-        if (userId != 0) {
-            // 평점 API
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(RatingService.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
-                    .build();
-            RatingService ratingService = retrofit.create(RatingService.class);
-
-            ratingService.getSuccess(userId, placeId, myRating).enqueue(new Callback<Rating>() {
-                @Override
-                public void onResponse(Call<Rating> call, Response<Rating> response) {
-                    if (response.body().getSuccess()) {
-                        Toast.makeText(MainActivity.this, "평점이 등록되었습니다.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Rating> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Toast.makeText(this, "로그인 후 이용 가능합니다.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
     public void onClick(View v) {
         Intent intent = null;
         switch (v.getId()) {
-            case R.id.fab_pick:
-                intent = new Intent(this, PickActivity.class);
-                break;
-            case R.id.btn_search:
-                intent = new Intent(this, SearchActivity.class);
-                intent.putExtra("searchType", "normal");
+            case R.id.tv_search:
+                intent = new Intent(this, BikesActivity.class);
                 break;
             case R.id.nav_login:
                 intent = new Intent(this, LoginActivity.class);
+                break;
+            case R.id.fab_pick:
+                intent = new Intent(this, PickActivity.class);
         }
         startActivity(intent);
-        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+    }
+
+    public static class AddressFragment extends Fragment {
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_address, container, false);
+            return rootView;
+        }
+    }
+
+    public static class PlaceFragment extends Fragment implements View.OnClickListener {
+        String placeId;
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_place, container, false);
+
+            LinearLayout bottomSheet = rootView.findViewById(R.id.bottom_sheet);
+            TextView tvPlace = rootView.findViewById(R.id.tv_place);
+            TextView tvAddress = rootView.findViewById(R.id.tv_address);
+
+            bottomSheet.setOnClickListener(this);
+
+            String title = getArguments().getString("title");
+            String address = getArguments().getString("address");
+            placeId = getArguments().getString("placeId");
+
+            tvPlace.setText(title);
+            tvAddress.setText(address);
+
+            return rootView;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(getActivity(), PlaceActivity.class);
+            intent.putExtra("placeId", placeId);
+            startActivity(intent);
+        }
     }
 }

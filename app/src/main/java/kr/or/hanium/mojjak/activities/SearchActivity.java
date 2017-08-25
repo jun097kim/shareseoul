@@ -33,7 +33,10 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // 툴바 Up 버튼 추가
+
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
         final RecyclerView rvSearch = (RecyclerView) findViewById(R.id.rv_search);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

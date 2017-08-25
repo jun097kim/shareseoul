@@ -28,6 +28,8 @@ public class BikesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
         final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
 
         // listview를 위한 레이아웃 매니저 설정

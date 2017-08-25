@@ -30,6 +30,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
+
         Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
 
@@ -39,7 +41,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
-                overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
             }
         });
     }

@@ -49,6 +49,8 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);      // 툴바 Up 버튼 추가
         getSupportActionBar().setDisplayShowTitleEnabled(false);    // 툴바 타이틀 없애기
 
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
         ImageButton swapBtn = (ImageButton) findViewById(R.id.swap_btn);
         mOrigin = (TextView) findViewById(R.id.origin);
         mDestination = (TextView) findViewById(R.id.destination);
@@ -66,7 +68,6 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
 
         initLayout();
         mRoutesAdapter = new RoutesAdapter(mRouteList, R.layout.route_list_item);
-
     }
 
     @Override
@@ -74,29 +75,21 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(this, SearchActivity.class);
 
         switch (v.getId()) {
-
             case R.id.origin:
                 intent.putExtra("searchType", "origin");
-                startActivityForResult(intent, REQUEST_CODE_ORIGIN);
-                // startActivityForResult() : SearchActivity 종료 → 결과 받는 메소드 onActivityResult() 호출
-
+                startActivityForResult(intent, REQUEST_CODE_ORIGIN);    // SearchActivity finish -> 결과 받는 onActivityResult 호출
                 break;
-
             case R.id.destination:
                 intent.putExtra("searchType", "destination");
                 startActivityForResult(intent, REQUEST_CODE_DESTINATION);
                 break;
-
             case R.id.swap_btn:
                 String temp = mOrigin.getText().toString();
                 mOrigin.setText(mDestination.getText());
                 mDestination.setText(temp);
-
                 break;
         }
-
     }
-
 
     private void initLayout() {
         mRouteRecyclerView = (RecyclerView) findViewById(R.id.rv_route);
@@ -174,11 +167,10 @@ public class RouteActivity extends AppCompatActivity implements View.OnClickList
                 String duration = response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText();
 
                 durationList.add(duration); // 총 걸리는 시간
-                walkingDurationList.add(WalkingDuration); // 총 도보 시간
+                walkingDurationList.add(WalkingDuration);   // 총 도보 시간
 
-                Toast.makeText(RouteActivity.this, "총 걸리는 시간"+ duration.indexOf(0), Toast.LENGTH_LONG).show();
-                Toast.makeText(RouteActivity.this, "총 도보 시간"+ walkingDurationList.indexOf(0), Toast.LENGTH_LONG).show();
-
+                Toast.makeText(RouteActivity.this, "총 걸리는 시간" + duration.indexOf(0), Toast.LENGTH_LONG).show();
+                Toast.makeText(RouteActivity.this, "총 도보 시간" + walkingDurationList.indexOf(0), Toast.LENGTH_LONG).show();
 
 
                 //distance duration html_instructions travel_mode

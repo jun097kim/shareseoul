@@ -19,6 +19,8 @@ public class PickActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
         LinearLayout llRestaurants = (LinearLayout) findViewById(R.id.ll_restaurants);
         LinearLayout llBikes = (LinearLayout) findViewById(R.id.ll_bikes);
         LinearLayout llBathrooms = (LinearLayout) findViewById(R.id.ll_bathrooms);

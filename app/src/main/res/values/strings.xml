@@ -14,4 +14,5 @@
     <string name="title_activity_bikes">따릉이 대여소</string>
     <string name="title_activity_restaurants">맛집</string>
     <string name="title_activity_pick">가까운 곳</string>
+    <string name="title_activity_place">장소</string>
 </resources>
