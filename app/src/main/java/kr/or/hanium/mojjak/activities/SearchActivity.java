@@ -1,15 +1,14 @@
 package kr.or.hanium.mojjak.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 import java.util.List;
 
@@ -25,16 +24,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchActivity extends AppCompatActivity {
-    MaterialSearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // 툴바 Up 버튼 추가
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
@@ -42,17 +36,31 @@ public class SearchActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvSearch.setLayoutManager(linearLayoutManager);
 
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        final FloatingSearchView mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+
+        AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
+        mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                mSearchView.setTranslationY(verticalOffset);
+            }
+        });
+
+        mSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+            @Override
+            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
+
+            }
+
+            @Override
+            public void onSearchAction(String currentQuery) {
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(SearchService.BASE_URL)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 SearchService searchService = retrofit.create(SearchService.class);
 
-                Call<Search> searchCall = searchService.getPlaces("37.56,126.97", "50000", query, getString(R.string.google_api_key));
+                Call<Search> searchCall = searchService.getPlaces("37.56,126.97", "50000", currentQuery, getString(R.string.google_api_key));
                 searchCall.enqueue(new Callback<Search>() {
                     @Override
                     public void onResponse(Call<Search> call, Response<Search> response) {
@@ -66,36 +74,14 @@ public class SearchActivity extends AppCompatActivity {
                         Toast.makeText(SearchActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //Do some magic
-                return false;
             }
         });
 
-        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+        mSearchView.setOnHomeActionClickListener(new FloatingSearchView.OnHomeActionClickListener() {
             @Override
-            public void onSearchViewShown() {
-                //Do some magic
-            }
-
-            @Override
-            public void onSearchViewClosed() {
-                //Do some magic
+            public void onHomeClicked() {
+                finish();
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
-
-        return true;
     }
 }
