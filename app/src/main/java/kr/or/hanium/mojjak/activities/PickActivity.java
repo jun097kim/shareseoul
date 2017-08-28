@@ -35,7 +35,7 @@ public class PickActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btn_routes) {
-            Intent intent = new Intent(this, RouteActivity.class);
+            Intent intent = new Intent(this, DirectionsActivity.class);
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, MainActivity.class);

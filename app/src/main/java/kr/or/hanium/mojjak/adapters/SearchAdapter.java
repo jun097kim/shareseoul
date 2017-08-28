@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import kr.or.hanium.mojjak.R;
-import kr.or.hanium.mojjak.activities.RouteActivity;
+import kr.or.hanium.mojjak.activities.DirectionsActivity;
 import kr.or.hanium.mojjak.models.Search.Results;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
@@ -37,7 +37,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         holder.cvSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(activity, RouteActivity.class);
+                Intent intent = new Intent(activity, DirectionsActivity.class);
                 intent.putExtra("result", resultsList.get(position).getName());
                 activity.setResult(Activity.RESULT_OK, intent);
                 activity.finish();

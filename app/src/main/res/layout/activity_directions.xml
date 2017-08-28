@@ -5,11 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="kr.or.hanium.mojjak.activities.RouteActivity">
+    tools:context="kr.or.hanium.mojjak.activities.DirectionsActivity">
     <!--
-    activity_route.xml(RouteActivity.java)
-    <- content_route.xml
-    <- fragment_route_list.xml(RouteListFragment.java)
+    activity_directions.xml(DirectionsActivity.java)
+    <- content_directions.xml
     -->
 
     <android.support.design.widget.AppBarLayout
@@ -37,8 +36,10 @@
                         android:id="@+id/origin"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
+                        android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:hint="출발지 검색"
+                        android:maxLines="1"
                         android:textSize="20sp" />
 
                     <View
@@ -50,8 +51,10 @@
                         android:id="@+id/destination"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
+                        android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:hint="도착지 검색"
+                        android:maxLines="1"
                         android:textSize="20sp" />
                 </LinearLayout>
 
@@ -73,6 +76,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_route" />
+    <include layout="@layout/content_directions" />
 
 </android.support.design.widget.CoordinatorLayout>

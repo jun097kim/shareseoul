@@ -3,85 +3,45 @@ package kr.or.hanium.mojjak.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Direction {
     @SerializedName("routes")
     @Expose
-    private ArrayList<Routes> routes;
+    private List<Routes> routes;
 
-    public ArrayList<Routes> getRoutes() {
+    public List<Routes> getRoutes() {
         return routes;
     }
 
     public class Routes {
         @SerializedName("legs")
         @Expose
-        private ArrayList<Legs> legs;
+        private List<Legs> legs;
 
-        @SerializedName("warnings")
-        @Expose
-        private String warnings;
-
-        public ArrayList<Legs> getLegs() {
+        public List<Legs> getLegs() {
             return legs;
-        }
-
-        public String getWarnings() {
-            return warnings;
         }
     }
 
     public class Legs {
-        @SerializedName("duration") // 총 시간
-        @Expose
-        private Duration duration;
-
-        @SerializedName("distance") // 총 거리
-        @Expose
-        private Distance distance;
-
-        @SerializedName("start_address")
-        @Expose
-        private String start_address;
-
-        @SerializedName("end_address")
-        @Expose
-        private String end_address;
-
         @SerializedName("steps")
         @Expose
-        private ArrayList<Steps> steps;
+        private List<Steps> steps;
 
-        public Duration getDuration() {
-            return duration;
-        }
-
-        public Distance getDistance() {
-            return distance;
-        }
-
-        public String getStart_address() {
-            return start_address;
-        }
-
-        public String getEnd_address() {
-            return end_address;
-        }
-
-        public ArrayList<Steps> getSteps() {
+        public List<Steps> getSteps() {
             return steps;
         }
     }
 
-    public class Steps { //Steps01
-        @SerializedName("duration") //Steps로 몇분?
+    public class Steps {
+        @SerializedName("travel_mode")
+        @Expose
+        private String travelMode;
+
+        @SerializedName("duration")
         @Expose
         private Duration duration;
-
-        @SerializedName("distance")
-        @Expose
-        private Distance distance;
 
         @SerializedName("transit_details")
         @Expose
@@ -91,28 +51,12 @@ public class Direction {
         @Expose
         private String htmlInstructions;
 
-        @SerializedName("steps") //WalkingSteps1
-        @Expose
-        private ArrayList<Steps> steps;
-
-        @SerializedName("travel_mode")
-        @Expose
-        private String travelmode;
-
-        @SerializedName("headsign")
-        @Expose
-        private String headsign;
-
-        @SerializedName("line")
-        @Expose
-        private Line line;
+        public String getTravelMode() {
+            return travelMode;
+        }
 
         public Duration getDuration() {
             return duration;
-        }
-
-        public Distance getDistance() {
-            return distance;
         }
 
         public TransitDetails getTransitDetails() {
@@ -121,22 +65,6 @@ public class Direction {
 
         public String getHtmlInstructions() {
             return htmlInstructions;
-        }
-
-        public ArrayList<Steps> getSteps() {
-            return steps;
-        }
-
-        public String getTravelmode() {
-            return travelmode;
-        }
-
-        public String getHeadsign() {
-            return headsign;
-        }
-
-        public Line getLine() {
-            return line;
         }
     }
 
@@ -150,10 +78,11 @@ public class Direction {
         }
     }
 
-    public class Distance extends Duration {
-    }
-
     public class TransitDetails {
+        @SerializedName("line")
+        @Expose
+        private Line line;
+
         @SerializedName("departure_stop")
         @Expose
         private DepartureStop departureStop;
@@ -162,9 +91,13 @@ public class Direction {
         @Expose
         private ArrivalStop arrivalStop;
 
-        @SerializedName("line")
+        @SerializedName("headsign")
         @Expose
-        private Line line;
+        private String headsign;
+
+        public Line getLine() {
+            return line;
+        }
 
         public DepartureStop getDepartureStop() {
             return departureStop;
@@ -174,8 +107,34 @@ public class Direction {
             return arrivalStop;
         }
 
-        public Line getLine() {
-            return line;
+        public String getHeadsign() {
+            return headsign;
+        }
+    }
+
+    public class Line {
+        @SerializedName("vehicle")
+        @Expose
+        private Vehicle vehicle;
+
+        @SerializedName("short_name")
+        @Expose
+        private String shortName;
+
+        @SerializedName("color")
+        @Expose
+        private String color;
+
+        public Vehicle getVehicle() {
+            return vehicle;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getColor() {
+            return color;
         }
     }
 
@@ -192,79 +151,13 @@ public class Direction {
     public class ArrivalStop extends DepartureStop {
     }
 
-    public class Line {
-        @SerializedName("short_name") //몇호선
-        @Expose
-        private String short_name;
-
-        @SerializedName("name") //예) 서울지하철, 인천 광역버스
-        @Expose
-        private String name;
-
-        @SerializedName("vehicle")
-        @Expose
-        private Vehicle vehicle;
-
-        public String getShort_name() {
-            return short_name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Vehicle getVehicle() {
-            return vehicle;
-        }
-    }
-
     public class Vehicle {
-        @SerializedName("name") //예) 지하철 or 버스
-        @Expose
-        private String name;
-
-        @SerializedName("type") //(영어로) SUBWAY / BUS
+        @SerializedName("type")
         @Expose
         private String type;
-
-        public String getName() {
-            return name;
-        }
 
         public String getType() {
             return type;
         }
-    }
-
-    public class innerSteps {
-        @SerializedName("distance")
-        @Expose
-        private innerDistance distance;
-
-        @SerializedName("duration")
-        @Expose
-        private innerDuration duration;
-
-        @SerializedName("travel_mode")
-        @Expose
-        private String travelmode;
-
-        public innerDistance getDistance() {
-            return distance;
-        }
-
-        public innerDuration getDuration() {
-            return duration;
-        }
-
-        public String getTravelmode() {
-            return travelmode;
-        }
-    }
-
-    public class innerDistance extends Duration {
-    }
-
-    public class innerDuration extends innerDistance {
     }
 }

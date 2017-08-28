@@ -25,8 +25,8 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
 
     @Override
     public BikesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View viewItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_bikes, parent, false);
-        BikesViewHolder bikesViewHolder = new BikesViewHolder(viewItem);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_bike, parent, false);
+        BikesViewHolder bikesViewHolder = new BikesViewHolder(view);
         return bikesViewHolder;
     }
 

@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
             intent = new Intent(this, SearchActivity.class);
             intent.putExtra("searchType", "normal");
         } else if (id == R.id.nav_route) {
-            intent = new Intent(this, RouteActivity.class);
+            intent = new Intent(this, DirectionsActivity.class);
         } else if (id == R.id.nav_restaurants) {
             intent = new Intent(this, RestaurantsActivity.class);
         }
