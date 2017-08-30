@@ -39,10 +39,10 @@ public class DirectionsAdapter extends RecyclerView.Adapter<DirectionsAdapter.Di
         int layoutRes;
         switch (viewType) {
             case TRANSIT:
-                layoutRes = R.layout.adapter_direction_transit;
+                layoutRes = R.layout.item_direction_transit;
                 break;
             default:    // WALKING
-                layoutRes = R.layout.adapter_direction_walking;
+                layoutRes = R.layout.item_direction_walking;
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false);
         DirectionsViewHolder directionsViewHolder = new DirectionsViewHolder(view);

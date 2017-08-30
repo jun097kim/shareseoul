@@ -1,13 +1,17 @@
 package kr.or.hanium.mojjak.activities;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
 import kr.or.hanium.mojjak.R;
+import kr.or.hanium.mojjak.adapters.DetailsAdapter;
 import kr.or.hanium.mojjak.interfaces.RatingService;
 import kr.or.hanium.mojjak.models.Rating;
 import retrofit2.Call;
@@ -36,6 +40,19 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
 
         rbMyRating = (RatingBar) findViewById(R.id.my_rating);
         rbMyRating.setOnRatingBarChangeListener(this);
+
+        RecyclerView rvDetails = (RecyclerView) findViewById(R.id.rv_details);
+
+        // 레이아웃 매니저 설정
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvDetails.setLayoutManager(linearLayoutManager);
+
+        Resources res = getResources();
+        String[] detailNames = res.getStringArray(R.array.bike_detail_names);
+        String[] detailValues = res.getStringArray(R.array.bike_detail_values);
+
+        DetailsAdapter adapter = new DetailsAdapter(detailNames, detailValues);
+        rvDetails.setAdapter(adapter);
     }
 
     @Override

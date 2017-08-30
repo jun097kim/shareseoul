@@ -32,11 +32,11 @@ public class BikesActivity extends AppCompatActivity {
 
         final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
 
-        // listview를 위한 레이아웃 매니저 설정
+        // 리사이클러뷰에 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager  = new LinearLayoutManager(this);
         rvBikes.setLayoutManager(linearLayoutManager);
 
-        // recyclerview 어댑터 만들기. 그 전에 리스트 아이템을 위한 레이아웃 만들기
+        // 리사이클러뷰 어댑터 만들기. 그 전에 리스트 아이템을 위한 레이아웃 만들기
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BikesService.BASE_URL)

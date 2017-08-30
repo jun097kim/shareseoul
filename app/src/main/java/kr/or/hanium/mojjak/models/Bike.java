@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class Bike {
     @SerializedName("id")
     @Expose
-    private int id;
+    private String id;
 
     @SerializedName("name")
     @Expose
@@ -22,7 +22,7 @@ public class Bike {
     @Expose
     private BigDecimal longitude;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

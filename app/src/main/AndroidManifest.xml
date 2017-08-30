@@ -16,7 +16,7 @@
 
         <!--
         구글 지도 API 키
-        (res/values/google_api.xml 파일)
+        (res/detailValues/google_api.xml 파일)
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
