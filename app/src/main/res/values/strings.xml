@@ -13,7 +13,7 @@
     <string name="title_activity_register">회원가입</string>
     <string name="title_activity_bikes">따릉이 대여소</string>
     <string name="title_activity_restaurants">맛집</string>
-    <string name="title_activity_pick">가까운 곳</string>
+    <string name="title_activity_pick">쉐어서울</string>
     <string name="title_activity_place">장소</string>
 
     <string-array name="bike_detail_names">

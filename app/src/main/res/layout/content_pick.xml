@@ -19,31 +19,10 @@
         android:paddingTop="20dp">
 
         <LinearLayout
-            android:id="@+id/ll_restaurants"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="65dp"
-                android:layout_height="65dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_restaurants" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="5dp"
-                android:text="맛집" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/ll_bikes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
@@ -63,6 +42,29 @@
                 android:padding="5dp"
                 android:text="따릉이" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_restaurants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_restaurants" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:text="음식점" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/ll_bathrooms"
@@ -93,7 +95,7 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/ll_bikes"
+            android:layout_below="@id/ll_restaurants"
             android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
             android:text="길찾기" />
