@@ -6,9 +6,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.widget.RatingBar;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.adapters.DetailsAdapter;
@@ -20,7 +26,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRatingBarChangeListener {
+public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
     private RatingBar rbMyRating;
     private int userId;
 
@@ -28,10 +34,6 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // 툴바 Up 버튼 추가
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
@@ -53,6 +55,12 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
 
         DetailsAdapter adapter = new DetailsAdapter(detailNames, detailValues);
         rvDetails.setAdapter(adapter);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        // 라이트 모드에서 클릭 이벤트 비활성화
+        mapFragment.getView().setClickable(false);
     }
 
     @Override
@@ -86,5 +94,15 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
         } else {
             Toast.makeText(this, "로그인 후 이용 가능합니다.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng seoul = new LatLng(37.56, 126.97);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));
+        googleMap.addMarker(new MarkerOptions().position(seoul));
+
+        // 툴바 비활성화
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 }
