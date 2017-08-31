@@ -21,34 +21,33 @@ public class PickActivity extends AppCompatActivity implements View.OnClickListe
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
-        LinearLayout llRestaurants = (LinearLayout) findViewById(R.id.ll_restaurants);
         LinearLayout llBikes = (LinearLayout) findViewById(R.id.ll_bikes);
+        LinearLayout llRestaurants = (LinearLayout) findViewById(R.id.ll_restaurants);
         LinearLayout llBathrooms = (LinearLayout) findViewById(R.id.ll_bathrooms);
-        Button btnRoutes = (Button) findViewById(R.id.btn_routes);
+        Button btnDirections = (Button) findViewById(R.id.btn_directions);
 
-        llRestaurants.setOnClickListener(this);
         llBikes.setOnClickListener(this);
+        llRestaurants.setOnClickListener(this);
         llBathrooms.setOnClickListener(this);
-        btnRoutes.setOnClickListener(this);
+        btnDirections.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.btn_routes) {
+        if (view.getId() == R.id.btn_directions) {
             Intent intent = new Intent(this, DirectionsActivity.class);
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, MainActivity.class);
             switch (view.getId()) {
-                case R.id.ll_restaurants:
-                    intent.putExtra("picked", "restaurants");
-                    break;
                 case R.id.ll_bikes:
                     intent.putExtra("picked", "bikes");
                     break;
+                case R.id.ll_restaurants:
+                    intent.putExtra("picked", "restaurants");
+                    break;
                 case R.id.ll_bathrooms:
                     intent.putExtra("picked", "bathrooms");
-                    break;
             }
             startActivity(intent);
         }

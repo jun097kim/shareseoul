@@ -11,5 +11,5 @@ public interface BathroomsService {
     String BASE_URL = "http://jun0.kim:8080/";  // public static final 생략
 
     @GET("bathrooms")
-    Call<List<Bathroom>> getPlaces(@Query("latitude") double latitude, @Query("longitude") double longitude);
+    Call<List<Bathroom>> getBathrooms(@Query("latitude") double latitude, @Query("longitude") double longitude);
 }

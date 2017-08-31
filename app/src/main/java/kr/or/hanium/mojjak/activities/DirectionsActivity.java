@@ -66,6 +66,19 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
         // 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvDirections.setLayoutManager(linearLayoutManager);
+
+        Intent intent = getIntent();
+        String setType = intent.getStringExtra("setType");
+
+        if (setType != null) {
+            switch (setType) {
+                case "origin":
+                    mOrigin.setText("장소명");
+                    break;
+                case "destination":
+                    mDestination.setText("장소명");
+            }
+        }
     }
 
     @Override

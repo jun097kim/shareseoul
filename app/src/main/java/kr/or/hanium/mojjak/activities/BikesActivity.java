@@ -33,7 +33,7 @@ public class BikesActivity extends AppCompatActivity {
         final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
 
         // 리사이클러뷰에 레이아웃 매니저 설정
-        LinearLayoutManager linearLayoutManager  = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvBikes.setLayoutManager(linearLayoutManager);
 
         // 리사이클러뷰 어댑터 만들기. 그 전에 리스트 아이템을 위한 레이아웃 만들기
@@ -45,12 +45,12 @@ public class BikesActivity extends AppCompatActivity {
 
         BikesService bikesService = retrofit.create(BikesService.class);
 
-        Call<List<Bike>> bikeCall = bikesService.getBike("37.56", "126.97");
+        Call<List<Bike>> bikeCall = bikesService.getBikes(37.56, 126.97);
         bikeCall.enqueue(new Callback<List<Bike>>() {
             @Override
             public void onResponse(Call<List<Bike>> call, Response<List<Bike>> response) {
                 List<Bike> bikes = response.body();
-                BikesAdapter adapter = new BikesAdapter(bikes);
+                BikesAdapter adapter = new BikesAdapter(bikes, BikesActivity.this);
                 rvBikes.setAdapter(adapter);
             }
 

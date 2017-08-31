@@ -37,6 +37,7 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btn_set_origin"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -44,6 +45,7 @@
                     android:text="출발지로" />
 
                 <Button
+                    android:id="@+id/btn_set_destination"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -74,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:text="화장실"
+                    android:text="서울광장 옆"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textStyle="bold" />
 
@@ -131,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:text="이 화장실 어떠셨나요?"
+                    android:text="이 따릉이 대여소 어떠셨나요?"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textStyle="bold" />
 

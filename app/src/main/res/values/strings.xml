@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">모짝 대중교통</string>
+    <string name="app_name">쉐어서울</string>
 
     <!-- 접근성 서비스 -->
     <string name="navigation_drawer_open">네비게이션 드로어 열기</string>

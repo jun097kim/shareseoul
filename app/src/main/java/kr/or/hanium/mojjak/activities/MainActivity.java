@@ -45,8 +45,10 @@ import java.util.Set;
 
 import kr.or.hanium.mojjak.R;
 import kr.or.hanium.mojjak.interfaces.BathroomsService;
+import kr.or.hanium.mojjak.interfaces.BikesService;
 import kr.or.hanium.mojjak.models.Bathroom;
-import kr.or.hanium.mojjak.models.BathroomMarker;
+import kr.or.hanium.mojjak.models.Bike;
+import kr.or.hanium.mojjak.models.placeMarker;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,20 +59,22 @@ import static kr.or.hanium.mojjak.R.id.map;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
-        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<BathroomMarker> {
-
-    private String userEmail;
+        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<placeMarker> {
 
     private GoogleMap mMap;
 
-    private BathroomsService mBathroomsService;
+    private String userEmail;
+    private String picked;
 
-    private ClusterManager<BathroomMarker> mClusterManager;
+    private BikesService bikesService;
+    private BathroomsService bathroomsService;
+
+    private ClusterManager<placeMarker> mClusterManager;
     private Handler handler = new Handler();
-    private List<BathroomMarker> bathroomMarkers = new ArrayList<>();
+    private List<placeMarker> placeMarkers = new ArrayList<>();
     private Set<String> visibleMarkers = new HashSet<>();
 
-    private BathroomMarker bathroomMarker;  // 클릭한 마커
+    private placeMarker placeMarker;  // 클릭한 마커
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,12 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(map);
+        mapFragment.getMapAsync(this);
+        handler.post(updateMarker);
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
@@ -115,18 +125,31 @@ public class MainActivity extends AppCompatActivity
 //            navLogin.setOnClickListener(null);
         }
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(map);
-        mapFragment.getMapAsync(this);
-        handler.post(updateMarker);
 
-        // 화장실 API
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BathroomsService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
-                .build();
-        mBathroomsService = retrofit.create(BathroomsService.class);
+        Intent intent = getIntent();
+        picked = intent.getStringExtra("picked");
+
+        Retrofit retrofit;
+        switch (picked) {
+            case "bikes":
+                // 따릉이 대여소 API
+                retrofit = new Retrofit.Builder()
+                        .baseUrl(BikesService.BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                        .build();
+                bikesService = retrofit.create(BikesService.class);
+                break;
+            case "restaurants":
+                // TODO: 음식점 API
+                break;
+            case "bathrooms":
+                // 화장실 API
+                retrofit = new Retrofit.Builder()
+                        .baseUrl(BathroomsService.BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                        .build();
+                bathroomsService = retrofit.create(BathroomsService.class);
+        }
     }
 
     @Override
@@ -181,7 +204,7 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                bathroomMarker = null;
+                placeMarker = null;
 
                 AddressFragment addressFragment = new AddressFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -197,20 +220,20 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCameraIdle() {
                 handler.post(updateMarker);
-                if (bathroomMarker == null) handler.post(updateAddress);
+                if (placeMarker == null) handler.post(updateAddress);
             }
         });
 
         mMap.setOnMarkerClickListener(mClusterManager);
     }
 
-    class BathroomRenderer extends DefaultClusterRenderer<BathroomMarker> {
-        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<BathroomMarker> clusterManager) {
+    class BathroomRenderer extends DefaultClusterRenderer<placeMarker> {
+        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<placeMarker> clusterManager) {
             super(context, map, clusterManager);
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(BathroomMarker item, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(placeMarker item, MarkerOptions markerOptions) {
             markerOptions.icon(item.getImage());
             markerOptions.snippet(item.getSnippet());
             markerOptions.title(item.getTitle());
@@ -268,51 +291,95 @@ public class MainActivity extends AppCompatActivity
             double latitude = target.latitude;
             double longitude = target.longitude;
 
-            Call<List<Bathroom>> placesAPIResponseCall = mBathroomsService.getPlaces(latitude, longitude);
-            placesAPIResponseCall.enqueue(new Callback<List<Bathroom>>() {
-                @Override
-                public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
-                    for (Bathroom bathroom : response.body()) {
-                        String id = bathroom.getId();
-                        String title = bathroom.getTitle();
-                        double latitude = bathroom.getLatitude();
-                        double longitude = bathroom.getLongitude();
+            switch (picked) {
+                case "bikes":
+                    Call<List<Bike>> bikesCall = bikesService.getBikes(latitude, longitude);
+                    bikesCall.enqueue(new Callback<List<Bike>>() {
+                        @Override
+                        public void onResponse(Call<List<Bike>> call, final Response<List<Bike>> response) {
+                            for (Bike bike : response.body()) {
+                                int id = bike.getId();
+                                String name = bike.getName();
+                                double latitude = bike.getLatitude();
+                                double longitude = bike.getLongitude();
 
-                        bathroomMarkers.add(new BathroomMarker(id, new LatLng(latitude, longitude), title));
-                    }
+                                placeMarkers.add(new placeMarker(Integer.toString(id), new LatLng(latitude, longitude), name));
+                            }
 
-                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                    for (final BathroomMarker item : bathroomMarkers) {
-                        if (bounds.contains(item.getPosition())) {
-                            if (!visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.add(item.getId());
-                                mClusterManager.addItem(item);
+                            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                            for (final placeMarker item : placeMarkers) {
+                                if (bounds.contains(item.getPosition())) {
+                                    if (!visibleMarkers.contains(item.getId())) {
+                                        visibleMarkers.add(item.getId());
+                                        mClusterManager.addItem(item);
+                                    }
+                                } else {
+                                    if (visibleMarkers.contains(item.getId())) {
+                                        visibleMarkers.remove(item.getId());
+                                        mClusterManager.removeItem(item);
+                                    }
+                                }
                             }
-                        } else {
-                            if (visibleMarkers.contains(item.getId())) {
-                                visibleMarkers.remove(item.getId());
-                                mClusterManager.removeItem(item);
-                            }
+
+                            // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
+                            mClusterManager.cluster();
                         }
-                    }
 
-                    // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
-                    mClusterManager.cluster();
-                }
+                        @Override
+                        public void onFailure(Call<List<Bike>> call, Throwable t) {
+                            Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+                case "restaurants":
+                    break;
+                case "bathrooms":
+                    Call<List<Bathroom>> bathroomsCall = bathroomsService.getBathrooms(latitude, longitude);
+                    bathroomsCall.enqueue(new Callback<List<Bathroom>>() {
+                        @Override
+                        public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
+                            for (Bathroom bathroom : response.body()) {
+                                String id = bathroom.getId();
+                                String name = bathroom.getName();
+                                double latitude = bathroom.getLatitude();
+                                double longitude = bathroom.getLongitude();
 
-                @Override
-                public void onFailure(Call<List<Bathroom>> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-                }
-            });
+                                placeMarkers.add(new placeMarker(id, new LatLng(latitude, longitude), name));
+                            }
+
+                            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                            for (final placeMarker item : placeMarkers) {
+                                if (bounds.contains(item.getPosition())) {
+                                    if (!visibleMarkers.contains(item.getId())) {
+                                        visibleMarkers.add(item.getId());
+                                        mClusterManager.addItem(item);
+                                    }
+                                } else {
+                                    if (visibleMarkers.contains(item.getId())) {
+                                        visibleMarkers.remove(item.getId());
+                                        mClusterManager.removeItem(item);
+                                    }
+                                }
+                            }
+
+                            // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
+                            mClusterManager.cluster();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Bathroom>> call, Throwable t) {
+                            Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            }
         }
     };
 
     @Override
-    public boolean onClusterItemClick(BathroomMarker bathroomMarker) {
-        this.bathroomMarker = bathroomMarker;
+    public boolean onClusterItemClick(placeMarker placeMarker) {
+        this.placeMarker = placeMarker;
 
-        LatLng position = bathroomMarker.getPosition();
+        LatLng position = placeMarker.getPosition();
         Geocoder geocoder = new Geocoder(this);
 
         List<Address> matches = null;
@@ -328,8 +395,9 @@ public class MainActivity extends AppCompatActivity
 
         PlaceFragment placeFragment = new PlaceFragment();
         Bundle args = new Bundle();
-        args.putString("title", bathroomMarker.getTitle());
-        args.putString("placeId", bathroomMarker.getId());
+        args.putString("name", placeMarker.getTitle());
+        args.putString("placeType", picked);
+        args.putString("placeId", placeMarker.getId());
         args.putString("address", address);
         placeFragment.setArguments(args);
 
@@ -339,8 +407,8 @@ public class MainActivity extends AppCompatActivity
 
         // 마커를 눌렀을 때 가운데로 이동되지 않게 함
         /*for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
-            if (marker.getPosition().latitude == bathroomMarker.getPosition().latitude &&
-                    marker.getPosition().longitude == bathroomMarker.getPosition().longitude) {
+            if (marker.getPosition().latitude == placeMarker.getPosition().latitude &&
+                    marker.getPosition().longitude == placeMarker.getPosition().longitude) {
                 marker.showInfoWindow();
             }
         }*/
@@ -382,15 +450,32 @@ public class MainActivity extends AppCompatActivity
 
             LinearLayout bottomSheet = rootView.findViewById(R.id.bottom_sheet);
             TextView tvPlace = rootView.findViewById(R.id.tv_place);
+            TextView tvPlaceType = rootView.findViewById(R.id.tv_place_type);
             TextView tvAddress = rootView.findViewById(R.id.tv_address);
 
             bottomSheet.setOnClickListener(this);
 
-            String title = getArguments().getString("title");
-            String address = getArguments().getString("address");
-            placeId = getArguments().getString("placeId");
+            Bundle args = getArguments();
 
-            tvPlace.setText(title);
+            String name = args.getString("name");
+            String placeType = null;
+
+            switch (args.getString("placeType")) {
+                case "bikes":
+                    placeType = "따릉이 대여소";
+                    break;
+                case "restaurants":
+                    placeType = "음식점";
+                    break;
+                case "bathrooms":
+                    placeType = "화장실";
+            }
+
+            String address = args.getString("address");
+            placeId = args.getString("placeId");
+
+            tvPlace.setText(name);
+            tvPlaceType.setText(placeType);
             tvAddress.setText(address);
 
             return rootView;

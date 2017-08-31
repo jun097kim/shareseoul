@@ -3,12 +3,10 @@ package kr.or.hanium.mojjak.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.math.BigDecimal;
-
 public class Bike {
     @SerializedName("id")
     @Expose
-    private String id;
+    private int id;
 
     @SerializedName("name")
     @Expose
@@ -16,13 +14,17 @@ public class Bike {
 
     @SerializedName("latitude")
     @Expose
-    private BigDecimal latitude;
+    private double latitude;
 
     @SerializedName("longitude")
     @Expose
-    private BigDecimal longitude;
+    private double longitude;
 
-    public String getId() {
+    @SerializedName("count")
+    @Expose
+    private int count;
+
+    public int getId() {
         return id;
     }
 
@@ -30,11 +32,15 @@ public class Bike {
         return name;
     }
 
-    public BigDecimal getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public BigDecimal getLongitude() {
+    public double getLongitude() {
         return longitude;
+    }
+
+    public int getCount() {
+        return count;
     }
 }

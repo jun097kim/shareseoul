@@ -1,5 +1,7 @@
 package kr.or.hanium.mojjak.adapters;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,13 +16,16 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import java.util.List;
 
 import kr.or.hanium.mojjak.R;
+import kr.or.hanium.mojjak.activities.PlaceActivity;
 import kr.or.hanium.mojjak.models.Bike;
 
 public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHolder> {
     List<Bike> bikes;
+    Activity activity;
 
-    public BikesAdapter(List<Bike> bikes) {
+    public BikesAdapter(List<Bike> bikes, Activity activity) {
         this.bikes = bikes;
+        this.activity = activity;
     }
 
     @Override
@@ -31,7 +36,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
     }
 
     @Override
-    public void onBindViewHolder(BikesViewHolder holder, int position) {
+    public void onBindViewHolder(BikesViewHolder holder, final int position) {
         String firstLetter = String.valueOf(bikes.get(position).getName().charAt(0));
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
@@ -43,8 +48,19 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
         TextDrawable drawable = TextDrawable.builder()
                 .buildRound(firstLetter, color);
 
-        holder.ivBikesItem.setImageDrawable(drawable);
-        holder.tvBikes.setText(bikes.get(position).getName());
+        holder.ivBike.setImageDrawable(drawable);
+        holder.tvName.setText(bikes.get(position).getName());
+
+        holder.cvBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, PlaceActivity.class);
+                intent.putExtra("placeType", "bike");
+                intent.putExtra("placeId", bikes.get(position).getId());
+                intent.putExtra("placeCount", bikes.get(position).getCount());
+                activity.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -54,15 +70,15 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
     }
 
     public static class BikesViewHolder extends RecyclerView.ViewHolder {
-        public CardView cvBikes;
-        public ImageView ivBikesItem;
-        public TextView tvBikes;
+        public CardView cvBike;
+        public ImageView ivBike;
+        public TextView tvName;
 
         public BikesViewHolder(View view) {
             super(view);
-            cvBikes = view.findViewById(R.id.cv_bikes);
-            ivBikesItem = view.findViewById(R.id.iv_bikes_item);
-            tvBikes = view.findViewById(R.id.tv_bikes);
+            cvBike = view.findViewById(R.id.cv_bike);
+            ivBike = view.findViewById(R.id.iv_bike);
+            tvName = view.findViewById(R.id.tv_name);
         }
     }
 }

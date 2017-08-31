@@ -10,7 +10,7 @@ public class Bathroom {
 
     @SerializedName("name")
     @Expose
-    private String title;
+    private String name;
 
     @SerializedName("latitude")
     @Expose
@@ -24,8 +24,8 @@ public class Bathroom {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
     public double getLatitude() {
