@@ -1,11 +1,14 @@
 package kr.or.hanium.mojjak.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
@@ -26,7 +29,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
+public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback, View.OnClickListener {
     private RatingBar rbMyRating;
     private int userId;
 
@@ -37,12 +40,19 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
+        Button btnSetOrigin = (Button) findViewById(R.id.btn_set_origin);
+        Button btnSetDestination = (Button) findViewById(R.id.btn_set_destination);
+
+        btnSetOrigin.setOnClickListener(this);
+        btnSetDestination.setOnClickListener(this);
+
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         userId = pref.getInt("userId", 0);
 
         rbMyRating = (RatingBar) findViewById(R.id.my_rating);
         rbMyRating.setOnRatingBarChangeListener(this);
 
+        // 장소 세부정보 리사이클러뷰
         RecyclerView rvDetails = (RecyclerView) findViewById(R.id.rv_details);
 
         // 레이아웃 매니저 설정
@@ -53,14 +63,43 @@ public class PlaceActivity extends AppCompatActivity implements RatingBar.OnRati
         String[] detailNames = res.getStringArray(R.array.bike_detail_names);
         String[] detailValues = res.getStringArray(R.array.bike_detail_values);
 
+        Intent intent = getIntent();
+        String placeType = intent.getStringExtra("placeType");
+
+        if (placeType != null) {
+            switch (placeType) {
+                case "bike":
+                    detailValues[0] = Integer.toString(intent.getIntExtra("placeId", 0));
+                    detailValues[1] = Integer.toString(intent.getIntExtra("placeCount", 0));
+                    break;
+                case "restaurant":
+                    break;
+                case "bathroom":
+            }
+        }
+
         DetailsAdapter adapter = new DetailsAdapter(detailNames, detailValues);
         rvDetails.setAdapter(adapter);
 
+        // 구글 지도 프래그먼트
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         // 라이트 모드에서 클릭 이벤트 비활성화
         mapFragment.getView().setClickable(false);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, DirectionsActivity.class);
+        switch (view.getId()) {
+            case R.id.btn_set_origin:
+                intent.putExtra("setType", "origin");
+                break;
+            case R.id.btn_set_destination:
+                intent.putExtra("setType", "destination");
+        }
+        startActivity(intent);
     }
 
     @Override
