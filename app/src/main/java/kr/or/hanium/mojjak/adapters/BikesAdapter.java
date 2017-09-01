@@ -50,6 +50,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
 
         int time = (int) (bikes.get(position).getDistance() * 15);
 
+        holder.tvNumber.setText(Integer.toString(position + 1));
         holder.ivBike.setImageDrawable(drawable);
         holder.tvName.setText(bikes.get(position).getName());
         holder.tvTime.setText("도보 약 " + time + "분");
@@ -74,6 +75,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
 
     public static class BikesViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout cvBike;
+        public TextView tvNumber;
         public ImageView ivBike;
         public TextView tvName;
         public TextView tvTime;
@@ -81,6 +83,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
         public BikesViewHolder(View view) {
             super(view);
             cvBike = view.findViewById(R.id.cv_bike);
+            tvNumber = view.findViewById(R.id.tv_number);
             ivBike = view.findViewById(R.id.iv_bike);
             tvName = view.findViewById(R.id.tv_name);
             tvTime = view.findViewById(R.id.tv_time);
