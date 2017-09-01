@@ -2,6 +2,7 @@ package kr.or.hanium.mojjak.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +32,7 @@ public class BikesActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
         final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
+        rvBikes.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         // 리사이클러뷰에 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

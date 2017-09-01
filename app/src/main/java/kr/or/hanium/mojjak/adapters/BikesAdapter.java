@@ -2,12 +2,12 @@ package kr.or.hanium.mojjak.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -48,8 +48,11 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
         TextDrawable drawable = TextDrawable.builder()
                 .buildRound(firstLetter, color);
 
+        int time = (int) (bikes.get(position).getDistance() * 15);
+
         holder.ivBike.setImageDrawable(drawable);
         holder.tvName.setText(bikes.get(position).getName());
+        holder.tvTime.setText("도보 약 " + time + "분");
 
         holder.cvBike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,15 +73,17 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
     }
 
     public static class BikesViewHolder extends RecyclerView.ViewHolder {
-        public CardView cvBike;
+        public LinearLayout cvBike;
         public ImageView ivBike;
         public TextView tvName;
+        public TextView tvTime;
 
         public BikesViewHolder(View view) {
             super(view);
             cvBike = view.findViewById(R.id.cv_bike);
             ivBike = view.findViewById(R.id.iv_bike);
             tvName = view.findViewById(R.id.tv_name);
+            tvTime = view.findViewById(R.id.tv_time);
         }
     }
 }

@@ -24,6 +24,10 @@ public class Bike {
     @Expose
     private int count;
 
+    @SerializedName("distance")
+    @Expose
+    private double distance;
+
     public int getId() {
         return id;
     }
@@ -42,5 +46,9 @@ public class Bike {
 
     public int getCount() {
         return count;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 }
