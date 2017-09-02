@@ -50,7 +50,6 @@
         android:id="@+id/fab_pick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="45dp"
         android:elevation="0dp"
         app:layout_anchor="@id/fragment_container"
         app:layout_anchorGravity="top|end"
