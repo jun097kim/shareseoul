@@ -1,21 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportHeight="512.0"
-    android:viewportWidth="512.0">
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
     <path
-        android:fillColor="#F4B2B0"
-        android:pathData="M76.3,318.4c-34.4,0 -62.4,-28 -62.4,-62.4s28,-62.4 62.4,-62.4s62.4,28 62.4,62.4S110.7,318.4 76.3,318.4z" />
-    <path
-        android:fillColor="#B3404A"
-        android:pathData="M76.3,332.3C34.2,332.3 0,298.1 0,256s34.2,-76.3 76.3,-76.3S152.6,213.9 152.6,256S118.4,332.3 76.3,332.3zM76.3,207.4c-26.8,0 -48.6,21.8 -48.6,48.6s21.8,48.6 48.6,48.6s48.6,-21.8 48.6,-48.6S103.1,207.4 76.3,207.4z" />
-    <path
-        android:fillColor="#F4B2B0"
-        android:pathData="M256,318.4c-34.4,0 -62.4,-28 -62.4,-62.4s28,-62.4 62.4,-62.4s62.4,28 62.4,62.4S290.4,318.4 256,318.4z" />
-    <path
-        android:fillColor="#B3404A"
-        android:pathData="M256,332.3c-42.1,0 -76.3,-34.2 -76.3,-76.3S213.9,179.7 256,179.7S332.3,213.9 332.3,256S298.1,332.3 256,332.3zM256,207.4c-26.8,0 -48.6,21.8 -48.6,48.6s21.8,48.6 48.6,48.6s48.6,-21.8 48.6,-48.6S282.8,207.4 256,207.4z" />
-    <path
-        android:fillColor="#B3404A"
-        android:pathData="M435.7,332.3c-42.1,0 -76.3,-34.2 -76.3,-76.3s34.2,-76.3 76.3,-76.3S512,213.9 512,256c0,7.7 -6.2,13.9 -13.9,13.9c-7.7,0 -13.9,-6.2 -13.9,-13.9c0,-26.8 -21.8,-48.6 -48.6,-48.6c-26.8,0 -48.6,21.8 -48.6,48.6s21.8,48.6 48.6,48.6c8.8,0 17.5,-2.4 25,-7c6.6,-4 15.1,-1.9 19.1,4.7c4,6.6 1.9,15.1 -4.7,19.1C463.2,328.5 449.6,332.3 435.7,332.3z" />
+        android:fillColor="#ffffff"
+        android:pathData="M4,11h5L9,5L4,5v6zM4,18h5v-6L4,12v6zM10,18h5v-6h-5v6zM16,18h5v-6h-5v6zM10,11h5L15,5h-5v6zM16,5v6h5L21,5h-5z" />
+    <!--
+    strokeColor: 테두리 색상
+    strokeWidth: 테두리 두께. 단위 px
+    -->
 </vector>
