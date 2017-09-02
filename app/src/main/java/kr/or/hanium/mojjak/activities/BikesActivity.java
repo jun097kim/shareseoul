@@ -1,5 +1,6 @@
 package kr.or.hanium.mojjak.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,10 @@ public class BikesActivity extends AppCompatActivity {
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
+        Intent intent = getIntent();
+        double latitude = intent.getDoubleExtra("latitude", 0);
+        double longitude = intent.getDoubleExtra("longitude", 0);
+
         final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
 
         // 리사이클러뷰에 레이아웃 매니저 설정
@@ -48,7 +53,7 @@ public class BikesActivity extends AppCompatActivity {
 
         BikesService bikesService = retrofit.create(BikesService.class);
 
-        Call<List<Bike>> bikeCall = bikesService.getBikes(37.56, 126.97);
+        Call<List<Bike>> bikeCall = bikesService.getBikes(latitude, longitude);
         bikeCall.enqueue(new Callback<List<Bike>>() {
             @Override
             public void onResponse(Call<List<Bike>> call, Response<List<Bike>> response) {
@@ -78,5 +83,12 @@ public class BikesActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    // 새로운 좌표로 리스트를 생성하려면 onCreate()가 호출되어야 하므로 액티비티 종료
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

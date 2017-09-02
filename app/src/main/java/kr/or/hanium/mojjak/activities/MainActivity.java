@@ -206,10 +206,7 @@ public class MainActivity extends AppCompatActivity
             public void onMapClick(LatLng latLng) {
                 placeMarker = null;
 
-                AddressFragment addressFragment = new AddressFragment();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addressFragment);
-                transaction.commit();
+                showAddressFragment();
 
                 handler.post(updateAddress);
             }
@@ -393,17 +390,7 @@ public class MainActivity extends AppCompatActivity
         // 주소에서 국가 이름 제거
         String address = bestMatch.getAddressLine(0).replaceFirst(bestMatch.getCountryName() + " ", "");
 
-        PlaceFragment placeFragment = new PlaceFragment();
-        Bundle args = new Bundle();
-        args.putString("name", placeMarker.getTitle());
-        args.putString("placeType", picked);
-        args.putString("placeId", placeMarker.getId());
-        args.putString("address", address);
-        placeFragment.setArguments(args);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, placeFragment);
-        transaction.commit();
+        showPlaceFragment(address);
 
         // 마커를 눌렀을 때 가운데로 이동되지 않게 함
         /*for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
@@ -420,7 +407,13 @@ public class MainActivity extends AppCompatActivity
         Intent intent = null;
         switch (v.getId()) {
             case R.id.tv_search:
+                LatLng target = mMap.getCameraPosition().target;
+                double latitude = target.latitude;
+                double longitude = target.longitude;
+
                 intent = new Intent(this, BikesActivity.class);
+                intent.putExtra("latitude", latitude);
+                intent.putExtra("longitude", longitude);
                 break;
             case R.id.nav_login:
                 intent = new Intent(this, LoginActivity.class);
@@ -487,5 +480,26 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra("placeId", placeId);
             startActivity(intent);
         }
+    }
+
+    private void showAddressFragment() {
+        AddressFragment addressFragment = new AddressFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, addressFragment);
+        transaction.commit();
+    }
+
+    private void showPlaceFragment(String address) {
+        PlaceFragment placeFragment = new PlaceFragment();
+        Bundle args = new Bundle();
+        args.putString("name", placeMarker.getTitle());
+        args.putString("placeType", picked);
+        args.putString("placeId", placeMarker.getId());
+        args.putString("address", address);
+        placeFragment.setArguments(args);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, placeFragment);
+        transaction.commit();
     }
 }
