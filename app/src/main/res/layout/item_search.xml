@@ -4,10 +4,10 @@
     android:id="@+id/cv_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardElevation="1dp">
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
 
     <TextView
         android:id="@+id/tv_search"

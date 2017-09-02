@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="kr.or.hanium.mojjak.activities.BikesActivity">
 
     <android.support.design.widget.CoordinatorLayout
@@ -62,14 +61,15 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_bikes"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
 
     <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
+        android:id="@+id/sv_bike"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"

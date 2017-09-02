@@ -36,7 +36,7 @@ public class SearchActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvSearch.setLayoutManager(linearLayoutManager);
 
-        final FloatingSearchView mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+        final FloatingSearchView mSearchView = (FloatingSearchView) findViewById(R.id.sv_bike);
 
         AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {

@@ -25,6 +25,7 @@
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="5dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <include layout="@layout/content_search" />
@@ -32,7 +33,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
+        android:id="@+id/sv_bike"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"
