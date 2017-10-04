@@ -36,4 +36,5 @@
         <item>1) 거치대에 부착되어 있는 잠금장치를 반납하는 자전거의 단말기에 결합해 주세요.\n(비어있는 거치대가 없을 때는 거치된 자전거의 보조잠금장치를 단말기에 결합해 주세요.)\n2) 반납이 완료되면 \"반납되었습니다\"라는 음성 멘트가 나옵니다.(반납완료 문자가 전송됩니다.)</item>
         <item>자전거정책과</item>
     </string-array>
+    <string name="title_activity_share">ShareActivity</string>
 </resources>

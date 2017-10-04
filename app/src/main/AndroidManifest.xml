@@ -33,6 +33,7 @@
             android:label="@string/title_activity_route"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+
             <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
 
             <meta-data
@@ -76,6 +77,10 @@
             android:label="@string/title_activity_place"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ShareActivity"
+            android:label="@string/title_activity_share"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

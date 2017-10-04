@@ -13,6 +13,9 @@
         <item
             android:id="@+id/nav_restaurants"
             android:title="맛집" />
+        <item
+            android:id="@+id/nav_share"
+            android:title="장소공유" />
     </group>
 
 </menu>

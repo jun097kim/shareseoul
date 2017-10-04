@@ -177,6 +177,8 @@ public class MainActivity extends AppCompatActivity
             intent = new Intent(this, DirectionsActivity.class);
         } else if (id == R.id.nav_restaurants) {
             intent = new Intent(this, RestaurantsActivity.class);
+        } else if (id == R.id.nav_share) {
+            intent = new Intent(this, ShareActivity.class);
         }
         startActivity(intent);
 

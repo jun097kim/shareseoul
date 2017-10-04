@@ -58,13 +58,13 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        app:contentPadding="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="15dp">
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -90,18 +90,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:text="평균 3점 "
+                        android:text="0%가 만족해요"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/colorAccent" />
-
-                    <RatingBar
-                        android:id="@+id/average_rating"
-                        style="?android:attr/ratingBarStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:numStars="5"
-                        android:stepSize="1.0" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -116,7 +107,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:paddingBottom="15dp"
+                android:clipToPadding="false"
+                android:paddingBottom="10dp"
                 android:paddingTop="15dp" />
 
             <View
@@ -138,13 +130,76 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textStyle="bold" />
 
-                <RatingBar
-                    android:id="@+id/my_rating"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:numStars="3"
-                    android:stepSize="1.0" />
+                    android:layout_centerVertical="true"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/ll_rating_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/iv_rating_good"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            app:srcCompat="@drawable/ic_rating_good" />
+
+                        <TextView
+                            android:id="@+id/tv_rating_good"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="만족" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_rating_fair"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/iv_rating_fair"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            app:srcCompat="@drawable/ic_rating_fair" />
+
+                        <TextView
+                            android:id="@+id/tv_rating_fair"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="평범" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_rating_poor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/iv_rating_poor"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            app:srcCompat="@drawable/ic_rating_poor" />
+
+                        <TextView
+                            android:id="@+id/tv_rating_poor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="별로" />
+                    </LinearLayout>
+
+                </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
