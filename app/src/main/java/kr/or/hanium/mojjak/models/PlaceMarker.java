@@ -7,13 +7,13 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import kr.or.hanium.mojjak.R;
 
-public class placeMarker implements ClusterItem {
+public class PlaceMarker implements ClusterItem {
     private LatLng position;
     private String title;
     private String id;
     private BitmapDescriptor image;
 
-    public placeMarker(String id, LatLng position, String title) {
+    public PlaceMarker(String id, LatLng position, String title) {
         this.id = id;
         this.position = position;
         this.title = title;

@@ -48,7 +48,8 @@ import kr.or.hanium.mojjak.interfaces.BathroomsService;
 import kr.or.hanium.mojjak.interfaces.BikesService;
 import kr.or.hanium.mojjak.models.Bathroom;
 import kr.or.hanium.mojjak.models.Bike;
-import kr.or.hanium.mojjak.models.placeMarker;
+import kr.or.hanium.mojjak.models.Place;
+import kr.or.hanium.mojjak.models.PlaceMarker;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,7 +58,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
-        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<placeMarker> {
+        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<PlaceMarker> {
 
     private GoogleMap mMap;
 
@@ -67,12 +68,12 @@ public class MainActivity extends AppCompatActivity
     private BikesService bikesService;
     private BathroomsService bathroomsService;
 
-    private ClusterManager<placeMarker> mClusterManager;
+    private ClusterManager<PlaceMarker> mClusterManager;
     private Handler handler = new Handler();
-    private List<placeMarker> placeMarkers = new ArrayList<>();
+    private List<PlaceMarker> placeMarkers = new ArrayList<>();
     private Set<String> visibleMarkers = new HashSet<>();
 
-    private placeMarker placeMarker;  // 클릭한 마커
+    private PlaceMarker placeMarker;  // 클릭한 마커
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,13 +223,13 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(mClusterManager);
     }
 
-    class BathroomRenderer extends DefaultClusterRenderer<placeMarker> {
-        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<placeMarker> clusterManager) {
+    class BathroomRenderer extends DefaultClusterRenderer<PlaceMarker> {
+        public BathroomRenderer(Context context, GoogleMap map, ClusterManager<PlaceMarker> clusterManager) {
             super(context, map, clusterManager);
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(placeMarker item, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(PlaceMarker item, MarkerOptions markerOptions) {
             markerOptions.icon(item.getImage());
             markerOptions.snippet(item.getSnippet());
             markerOptions.title(item.getTitle());
@@ -289,92 +290,62 @@ public class MainActivity extends AppCompatActivity
             switch (picked) {
                 case "bikes":
                     Call<List<Bike>> bikesCall = bikesService.getBikes(latitude, longitude);
-                    bikesCall.enqueue(new Callback<List<Bike>>() {
-                        @Override
-                        public void onResponse(Call<List<Bike>> call, final Response<List<Bike>> response) {
-                            for (Bike bike : response.body()) {
-                                int id = bike.getId();
-                                String name = bike.getName();
-                                double latitude = bike.getLatitude();
-                                double longitude = bike.getLongitude();
-
-                                placeMarkers.add(new placeMarker(Integer.toString(id), new LatLng(latitude, longitude), name));
-                            }
-
-                            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                            for (final placeMarker item : placeMarkers) {
-                                if (bounds.contains(item.getPosition())) {
-                                    if (!visibleMarkers.contains(item.getId())) {
-                                        visibleMarkers.add(item.getId());
-                                        mClusterManager.addItem(item);
-                                    }
-                                } else {
-                                    if (visibleMarkers.contains(item.getId())) {
-                                        visibleMarkers.remove(item.getId());
-                                        mClusterManager.removeItem(item);
-                                    }
-                                }
-                            }
-
-                            // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
-                            mClusterManager.cluster();
-                        }
-
-                        @Override
-                        public void onFailure(Call<List<Bike>> call, Throwable t) {
-                            Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    markerCall(bikesCall);
                     break;
                 case "restaurants":
                     break;
                 case "bathrooms":
                     Call<List<Bathroom>> bathroomsCall = bathroomsService.getBathrooms(latitude, longitude);
-                    bathroomsCall.enqueue(new Callback<List<Bathroom>>() {
-                        @Override
-                        public void onResponse(Call<List<Bathroom>> call, final Response<List<Bathroom>> response) {
-                            for (Bathroom bathroom : response.body()) {
-                                String id = bathroom.getId();
-                                String name = bathroom.getName();
-                                double latitude = bathroom.getLatitude();
-                                double longitude = bathroom.getLongitude();
-
-                                placeMarkers.add(new placeMarker(id, new LatLng(latitude, longitude), name));
-                            }
-
-                            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                            for (final placeMarker item : placeMarkers) {
-                                if (bounds.contains(item.getPosition())) {
-                                    if (!visibleMarkers.contains(item.getId())) {
-                                        visibleMarkers.add(item.getId());
-                                        mClusterManager.addItem(item);
-                                    }
-                                } else {
-                                    if (visibleMarkers.contains(item.getId())) {
-                                        visibleMarkers.remove(item.getId());
-                                        mClusterManager.removeItem(item);
-                                    }
-                                }
-                            }
-
-                            // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
-                            mClusterManager.cluster();
-                        }
-
-                        @Override
-                        public void onFailure(Call<List<Bathroom>> call, Throwable t) {
-                            Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    markerCall(bathroomsCall);
             }
         }
     };
 
-    @Override
-    public boolean onClusterItemClick(placeMarker placeMarker) {
-        this.placeMarker = placeMarker;
+    public void markerCall(Call call) {
+        call.enqueue(new Callback<List<Place>>() {
+            @Override
+            public void onResponse(Call<List<Place>> call, Response<List<Place>> response) {
+                // response.body()는 List<Place> 타입만 반환한다.
+                for (Place place : response.body()) {
+                    String id = place.getId();
+                    String name = place.getName();
+                    double latitude = place.getLatitude();
+                    double longitude = place.getLongitude();
 
-        LatLng position = placeMarker.getPosition();
+                    placeMarkers.add(new PlaceMarker(id, new LatLng(latitude, longitude), name));
+                }
+
+                LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                for (final PlaceMarker item : placeMarkers) {
+                    if (bounds.contains(item.getPosition())) {
+                        if (!visibleMarkers.contains(item.getId())) {
+                            visibleMarkers.add(item.getId());
+                            mClusterManager.addItem(item);
+                        }
+                    } else {
+                        if (visibleMarkers.contains(item.getId())) {
+                            visibleMarkers.remove(item.getId());
+                            mClusterManager.removeItem(item);
+                        }
+                    }
+                }
+
+                // run 메소드 바로 아래에 추가하면 안 됨. 응답이 오지 않아도 클러스터될 수 있음
+                mClusterManager.cluster();
+            }
+
+            @Override
+            public void onFailure(Call<List<Place>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public boolean onClusterItemClick(PlaceMarker PlaceMarker) {
+        this.placeMarker = PlaceMarker;
+
+        LatLng position = PlaceMarker.getPosition();
         Geocoder geocoder = new Geocoder(this);
 
         List<Address> matches = null;

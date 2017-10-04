@@ -3,36 +3,20 @@ package kr.or.hanium.mojjak.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Bathroom {
-    @SerializedName("id")
+public class Bathroom extends Place {
+    @SerializedName("address")
     @Expose
-    private String id;
+    private String address;
 
-    @SerializedName("name")
+    @SerializedName("phone")
     @Expose
-    private String name;
+    private String phone;
 
-    @SerializedName("latitude")
-    @Expose
-    private double latitude;
-
-    @SerializedName("longitude")
-    @Expose
-    private double longitude;
-
-    public String getId() {
-        return id;
+    public String getAddress() {
+        return address;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+    public String getPhone() {
+        return phone;
     }
 }
