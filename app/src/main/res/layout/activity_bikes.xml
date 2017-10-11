@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.or.hanium.mojjak.activities.BikesActivity">
+    tools:context="kr.or.hanium.shareseoul.activities.BikesActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"

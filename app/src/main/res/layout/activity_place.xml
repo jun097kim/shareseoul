@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.or.hanium.mojjak.activities.PlaceActivity">
+    tools:context="kr.or.hanium.shareseoul.activities.PlaceActivity">
 
     <include layout="@layout/content_place" />
 

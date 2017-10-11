@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kr.or.hanium.mojjak">
+    package="kr.or.hanium.shareseoul">
 
-    <!-- 구글 지도 API 퍼미션 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,51 +13,54 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--
-        구글 지도 API 키
-        (res/detailValues/google_api.xml 파일)
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key" />
-
         <activity
-            android:name=".activities.MainActivity"
+            android:name="kr.or.hanium.shareseoul.activities.MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activities.DirectionsActivity"
-            android:label="@string/title_activity_route"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
 
+        <activity
+            android:name="kr.or.hanium.shareseoul.activities.DirectionsActivity"
+            android:label="@string/title_activity_route"
+            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="kr.or.hanium.mojjak.activities.MainActivity" />
+                android:value="kr.or.hanium.shareseoul.activities.MainActivity" />
             <!-- Android 4.1 (API level 16) 이전 -->
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="@string/kakaolink_host"
+                    android:scheme="@string/kakao_scheme" />
+            </intent-filter>
         </activity>
         <activity
-            android:name=".activities.LoginActivity"
+            android:name="kr.or.hanium.shareseoul.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name="kr.or.hanium.shareseoul.activities.RegisterActivity"
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.BikesActivity"
+            android:name="kr.or.hanium.shareseoul.activities.BikesActivity"
             android:label="@string/title_activity_bikes"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.RestaurantsActivity"
+            android:name="kr.or.hanium.shareseoul.activities.RestaurantsActivity"
             android:label="@string/title_activity_restaurants"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.PickActivity"
+            android:name="kr.or.hanium.shareseoul.activities.PickActivity"
             android:label="@string/title_activity_pick"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -68,19 +70,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.SearchActivity"
+            android:name="kr.or.hanium.shareseoul.activities.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".activities.MainActivity"
+            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.PlaceActivity"
+            android:name="kr.or.hanium.shareseoul.activities.PlaceActivity"
             android:label="@string/title_activity_place"
-            android:parentActivityName=".activities.MainActivity"
+            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.ShareActivity"
+            android:name="kr.or.hanium.shareseoul.activities.ShareActivity"
             android:label="@string/title_activity_share"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
     </application>
 
 </manifest>

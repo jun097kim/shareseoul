@@ -15,6 +15,7 @@
     <string name="title_activity_restaurants">맛집</string>
     <string name="title_activity_pick">쉐어서울</string>
     <string name="title_activity_place">장소</string>
+    <string name="title_activity_share">공유</string>
 
     <string-array name="bike_detail_names">
         <item>대여소번호</item>
@@ -36,5 +37,6 @@
         <item>1) 거치대에 부착되어 있는 잠금장치를 반납하는 자전거의 단말기에 결합해 주세요.\n(비어있는 거치대가 없을 때는 거치된 자전거의 보조잠금장치를 단말기에 결합해 주세요.)\n2) 반납이 완료되면 \"반납되었습니다\"라는 음성 멘트가 나옵니다.(반납완료 문자가 전송됩니다.)</item>
         <item>자전거정책과</item>
     </string-array>
-    <string name="title_activity_share">ShareActivity</string>
+
+    <string name="tourapi_servicekey">YFJzrf1KjCXsqBIcJSLnVd21BLUav7pKq8G6iaK9wHJU2j0HAme%2FQhUnCV5DG3Z2CA1oVP9Sojz5Kd6suef1Kw%3D%3D</string>
 </resources>

@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="5dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="kr.or.hanium.mojjak.activities.PlaceActivity"
+    tools:context="kr.or.hanium.shareseoul.activities.PlaceActivity"
     tools:showIn="@layout/activity_place">
 
     <android.support.v7.widget.CardView

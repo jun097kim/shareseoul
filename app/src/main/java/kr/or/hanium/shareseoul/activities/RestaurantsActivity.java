@@ -1,0 +1,64 @@
+package kr.or.hanium.shareseoul.activities;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+
+import java.util.ArrayList;
+
+import kr.or.hanium.shareseoul.R;
+import kr.or.hanium.shareseoul.models.Restaurants;
+
+public class RestaurantsActivity extends AppCompatActivity {
+    RecyclerView rvRestaurants;
+    RecyclerView.Adapter adapter;//어댑터
+    ArrayList<Restaurants.Item> restaurantsItems;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_restaurants);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
+
+        initViews();
+    }
+
+    private void initViews() {
+        rvRestaurants = (RecyclerView) findViewById(R.id.recyclerView);
+        rvRestaurants.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvRestaurants.setLayoutManager(linearLayoutManager);
+        loadJson();
+    }
+
+    private void loadJson() {
+/*
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(RestaurantsService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create()) // JSON Converter 지정
+                .build();
+        RestaurantsService restaurantsService = retrofit.create(RestaurantsService.class);
+
+        Call<Restaurants> recommendationAPIResponseCall = restaurantsService.getRestaurants("12b7b22a1af7d9e2173ac88f2af8654f", "FD6", "37.56331,126.97590", "10000");
+        recommendationAPIResponseCall.enqueue(new Callback<Restaurants>() {
+            @Override
+            public void onResponse(Call<Restaurants> call, Response<Restaurants> response) {
+                restaurantsItems = response.body().getChannel().getItem();
+                adapter = new RestaurantsAdapter(restaurantsItems, RestaurantsActivity.this);
+                rvRestaurants.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<Restaurants> call, Throwable t) {
+                Toast.makeText(RestaurantsActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+*/
+    }
+}

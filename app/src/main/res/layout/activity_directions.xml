@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="kr.or.hanium.mojjak.activities.DirectionsActivity">
+    tools:context="kr.or.hanium.shareseoul.activities.DirectionsActivity">
     <!--
     activity_directions.xml(DirectionsActivity.java)
     <- content_directions.xml

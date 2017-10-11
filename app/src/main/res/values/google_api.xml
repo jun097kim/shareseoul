@@ -1,4 +1,0 @@
-<resources>
-    <!-- 구글 API 키 -->
-    <string name="google_api_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDxkEF1U7DlPTiL3zp3qFEkYYlFbmxD5MU</string>
-</resources>
