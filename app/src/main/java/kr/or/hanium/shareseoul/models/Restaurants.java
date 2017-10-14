@@ -57,7 +57,7 @@ public class Restaurants {
         @Expose
         private String addr1;
 
-        @SerializedName("contenttypeid")
+        @SerializedName("contentid")
         @Expose
         private String id;
 

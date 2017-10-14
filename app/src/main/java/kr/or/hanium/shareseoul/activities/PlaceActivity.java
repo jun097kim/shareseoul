@@ -36,6 +36,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
     private int userId;
+
+    private String placeName;
+    private String placeId;
+
     private ArrayList<LinearLayout> llRating = new ArrayList<>(3);
     private ArrayList<ImageView> ivRating = new ArrayList<>(3);
     private ArrayList<TextView> tvRating = new ArrayList<>(3);
@@ -57,11 +61,23 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
         // 라이트 모드에서 클릭 이벤트 비활성화
         mapFragment.getView().setClickable(false);
 
+
+        // 뷰에 리스너 연결하기
         Button btnSetOrigin = (Button) findViewById(R.id.btn_set_origin);
         Button btnSetDestination = (Button) findViewById(R.id.btn_set_destination);
 
         btnSetOrigin.setOnClickListener(this);
         btnSetDestination.setOnClickListener(this);
+
+
+        Intent intent = getIntent();
+
+        placeName = intent.getStringExtra("placeName");
+        placeId = intent.getStringExtra("placeId");
+
+        TextView tvPlaceName = (TextView) findViewById(R.id.place_name);
+        tvPlaceName.setText(placeName);
+
 
         // 장소 세부정보 리사이클러뷰
         RecyclerView rvDetails = (RecyclerView) findViewById(R.id.rv_details);
@@ -74,7 +90,6 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
         String[] detailNames = res.getStringArray(R.array.bike_detail_names);
         String[] detailValues = res.getStringArray(R.array.bike_detail_values);
 
-        Intent intent = getIntent();
         String placeType = intent.getStringExtra("placeType");
 
         if (placeType != null) {
@@ -116,10 +131,12 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
         switch (view.getId()) {
             case R.id.btn_set_origin:
                 intent.putExtra("setType", "origin");
+                intent.putExtra("placeName", placeName);
                 startActivity(intent);
                 break;
             case R.id.btn_set_destination:
                 intent.putExtra("setType", "destination");
+                intent.putExtra("placeName", placeName);
                 startActivity(intent);
                 break;
             case R.id.ll_rating_good:
@@ -134,8 +151,6 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
     public void ratingCall(final int myRating) {
-        String placeId = getIntent().getStringExtra("placeId");
-
         // 평점 API
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(RatingService.BASE_URL)

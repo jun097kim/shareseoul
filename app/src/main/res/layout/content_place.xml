@@ -71,12 +71,11 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/toilet_place"
+                    android:id="@+id/place_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:text="서울광장 옆"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textStyle="bold" />
 

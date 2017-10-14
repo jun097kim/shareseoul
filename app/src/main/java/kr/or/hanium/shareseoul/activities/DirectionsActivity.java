@@ -67,16 +67,19 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvDirections.setLayoutManager(linearLayoutManager);
 
+
         Intent intent = getIntent();
+
         String setType = intent.getStringExtra("setType");
+        String placeName = intent.getStringExtra("placeName");
 
         if (setType != null) {
             switch (setType) {
                 case "origin":
-                    mOrigin.setText("장소명");
+                    mOrigin.setText(placeName);
                     break;
                 case "destination":
-                    mDestination.setText("장소명");
+                    mDestination.setText(placeName);
             }
         }
     }
@@ -128,9 +131,15 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
         directionCall.enqueue(new Callback<Direction>() {
             @Override
             public void onResponse(Call<Direction> call, Response<Direction> response) {
-                List<Direction.Steps> stepsList = response.body().getRoutes().get(0).getLegs().get(0).getSteps();
-                DirectionsAdapter adapter = new DirectionsAdapter(stepsList, mDestination.getText().toString());
-                rvDirections.setAdapter(adapter);
+                List<Direction.Routes> routes = response.body().getRoutes();
+
+                if (routes.size() > 0) {
+                    List<Direction.Steps> stepsList = routes.get(0).getLegs().get(0).getSteps();
+                    DirectionsAdapter adapter = new DirectionsAdapter(stepsList, mDestination.getText().toString());
+                    rvDirections.setAdapter(adapter);
+                } else {
+                    Toast.makeText(DirectionsActivity.this, "경로를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

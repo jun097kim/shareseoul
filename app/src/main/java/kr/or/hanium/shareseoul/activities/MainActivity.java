@@ -722,12 +722,14 @@ public class MainActivity extends AppCompatActivity
 
     public static class PlaceFragment extends Fragment implements View.OnClickListener {
         String placeId;
+        String placeName;
 
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_place, container, false);
 
+            // 뷰에 리스너 연결하기
             LinearLayout bottomSheet = rootView.findViewById(R.id.bottom_sheet);
             TextView tvPlace = rootView.findViewById(R.id.tv_place);
             TextView tvPlaceType = rootView.findViewById(R.id.tv_place_type);
@@ -735,11 +737,10 @@ public class MainActivity extends AppCompatActivity
 
             bottomSheet.setOnClickListener(this);
 
+
             Bundle args = getArguments();
 
-            String name = args.getString("name");
             String placeType = args.getString("placeType");
-
             if (placeType != null) {
                 switch (placeType) {
                     case "bikes":
@@ -755,8 +756,10 @@ public class MainActivity extends AppCompatActivity
 
             String address = args.getString("address");
             placeId = args.getString("placeId");
+            placeName = args.getString("name");
 
-            tvPlace.setText(name);
+
+            tvPlace.setText(placeName);
             tvPlaceType.setText(placeType);
             tvAddress.setText(address);
 
@@ -767,6 +770,7 @@ public class MainActivity extends AppCompatActivity
         public void onClick(View view) {
             Intent intent = new Intent(getActivity(), PlaceActivity.class);
             intent.putExtra("placeId", placeId);
+            intent.putExtra("placeName", placeName);
             startActivity(intent);
         }
     }
