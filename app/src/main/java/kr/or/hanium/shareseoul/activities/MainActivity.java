@@ -2,22 +2,29 @@ package kr.or.hanium.shareseoul.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,19 +34,35 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -62,9 +85,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
-        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<PlaceMarker> {
+        OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<PlaceMarker>,
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
+    private CameraPosition mCameraPosition;
+
+    // 현재 위치를 가져오기 위한 Fused Location Provider
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+
+    // 위치 권한이 부여되지 않은 경우 사용할 기본 위치 (Seoul, Korea)와 기본 줌 레벨
+    private final LatLng mDefaultLocation = new LatLng(37.56, 126.97);
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean mLocationPermissionGranted;
+
+    // 장치의 현재 위치
+    private Location mLastKnownLocation;
+
+    // 액티비티 상태 저장을 위한 키
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+
 
     private String userEmail;
     private String picked;
@@ -83,21 +126,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // savedInstanceState에서 위치와 카메라 위치를 가져온다.
+        if (savedInstanceState != null) {
+            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+        }
+
         setContentView(R.layout.activity_main);
+
+        // FusedLocationProviderClient 인스턴스 생성
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // 지도 만들기
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
-
-        AddressFragment addressFragment = new AddressFragment();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, addressFragment).commit();
-
-        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
-        TextView tvSearch = (TextView) findViewById(R.id.tv_search);
-
-        fabPick.setOnClickListener(this);
-        tvSearch.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -105,20 +154,39 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        handler.post(updateMarker);
 
-
+        // 네비게이션 헤더(로그인 메뉴)에 리스너 설정
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
 
-        // 네비게이션 헤더(로그인 메뉴)에 리스너 설정
         RelativeLayout navLogin = headerView.findViewById(R.id.nav_login);
         navigationView.setNavigationItemSelectedListener(this);
         navLogin.setOnClickListener(this);
+
+
+        // 액티비티 전환 애니메이션 없애기
+        overridePendingTransition(0, 0);
+
+        // bottom sheet에 기본 address 프래그먼트 추가
+        AddressFragment addressFragment = new AddressFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, addressFragment).commit();
+
+        // 뷰에 리스너 설정하기
+        TextView tvSearch = (TextView) findViewById(R.id.tv_search);
+        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
+        FloatingActionButton fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
+
+        tvSearch.setOnClickListener(this);
+        fabPick.setOnClickListener(this);
+        fabMyLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 위치 설정 다이얼로그 띄우기
+                createLocationRequest();
+            }
+        });
+
 
         // 로그인되어 있는지 확인
         TextView tvEmail = headerView.findViewById(R.id.tv_email);
@@ -161,6 +229,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * 액티비티가 일시정지될 때 지도의 상태 저장
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mMap != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            super.onSaveInstanceState(outState);
+        }
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -171,46 +251,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // 네비게이션 메뉴 아이템을 눌렀을 때 호출
-    @SuppressWarnings("StatementWithEmptyBody")
+    /**
+     * 지도를 사용할 준비가 되면 호출
+     */
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        Intent intent = null;
+    public void onMapReady(GoogleMap map) {
+        mMap = map;
 
-        // 아이템에 해당하는 액티비티로 전환
-        if (id == R.id.nav_search) {
-            intent = new Intent(this, SearchActivity.class);
-            intent.putExtra("searchType", "normal");
-        } else if (id == R.id.nav_route) {
-            intent = new Intent(this, DirectionsActivity.class);
-        } else if (id == R.id.nav_restaurants) {
-            intent = new Intent(this, RestaurantsActivity.class);
-        } else if (id == R.id.nav_share) {
-            intent = new Intent(this, ShareActivity.class);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        if (mCameraPosition == null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
         }
-        startActivity(intent);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    // 지도를 사용할 준비가 되면 호출
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        LatLng seoul = new LatLng(37.56, 126.97);   // Lat(Latitude): 위도, Lng(Longitude): 경도
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));  // 서울로 카메라 이동
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); // 줌 레벨 15으로 설정
 
         // 클러스터 매니저 생성
         mClusterManager = new ClusterManager<>(this, mMap);
 
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setRenderer(new ClusterRenderer(this, mMap, mClusterManager, picked));
+
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -223,8 +283,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // 카메라 이동이 끝났을 때, 한 번만 호출
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            /**
+             * 카메라 이동이 끝났을 때, 한 번만 호출
+             */
             @Override
             public void onCameraIdle() {
                 handler.post(updateMarker);
@@ -234,6 +296,148 @@ public class MainActivity extends AppCompatActivity
 
         mMap.setOnMarkerClickListener(mClusterManager);
     }
+
+    /**
+     * 장치의 현재 위치 얻어서 지도 카메라 위치시키기
+     */
+    private void getDeviceLocation() {
+        /*
+         * 장치의 가장 최근 위치를 가져오고, 위치를 사용할 수 없는 경우 null일 수 있다.
+         */
+        try {
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // 지도의 카메라 위치를 장치의 현재 위치로 설정
+                            mLastKnownLocation = task.getResult();
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(mLastKnownLocation.getLatitude(),
+                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                        } else {
+                            Log.d(TAG, "현재 위치가 null 입니다. 기본 위치를 사용합니다.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+
+    /**
+     * 런타임에 location 권한 요청
+     */
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * location 권한 요청 결과
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        mLocationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // 요청을 취소한 경우, 결과는 빈 배열
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
+                    updateLocationUI();
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 유저가 location 권한을 부여한 경우 My Location 계층 활성화
+     */
+    private void updateLocationUI() {
+        if (mMap == null) {
+            return;
+        }
+        try {
+            if (mLocationPermissionGranted) {
+                mMap.setMyLocationEnabled(true);
+            } else {
+                mMap.setMyLocationEnabled(false);
+                mLastKnownLocation = null;
+                getLocationPermission();
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+
+    protected void createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // 권한 요청 다이얼로그 띄우기
+                getLocationPermission();
+
+                // My Location 계층 활성화
+                updateLocationUI();
+
+                // 장치의 현재 위치를 얻고 지도에 설정하기
+                getDeviceLocation();
+            }
+        });
+
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                int statusCode = ((ApiException) e).getStatusCode();
+                switch (statusCode) {
+                    case CommonStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            resolvable.startResolutionForResult(MainActivity.this,
+                                    3);
+                        } catch (IntentSender.SendIntentException sendEx) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
+    }
+
 
     class ClusterRenderer extends DefaultClusterRenderer<PlaceMarker> {
         String picked;
@@ -265,6 +469,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     Runnable updateAddress = new Runnable() {
         @Override
         public void run() {
@@ -280,7 +485,11 @@ public class MainActivity extends AppCompatActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Address bestMatch = (matches == null) ? null : matches.get(0);
+
+            Address bestMatch = null;
+            if (matches != null && matches.size() > 0) {
+                bestMatch = matches.get(0);
+            }
 
             TextView tvAddress = (TextView) findViewById(R.id.tv_place);
 
@@ -322,7 +531,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case "restaurants":
                     Call<Restaurants> restaurantsCall = restaurantsService.getRestaurants(100, 1, 1,
-                            "AND", "shareseoul", 'A', 39, longitude, latitude, 1000, 'Y', "json");
+                            "AND", "shareseoul", 'A', 39, longitude, latitude, 2000, 'Y', "json");
                     restaurantsMarkerCall(restaurantsCall);
                     break;
                 case "bathrooms":
@@ -331,6 +540,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
+
 
     public void markerCall(Call call) {
         call.enqueue(new Callback<List<Place>>() {
@@ -406,7 +616,15 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<Restaurants> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                if (t instanceof UnknownHostException) {
+                    Toast.makeText(MainActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
+                }
+
+                // TODO: Use custom JsonDeserializer
+                // String 타입의 items 반환하는 경우
+//                else if (t instanceof JsonSyntaxException) {
+//
+//                }
             }
         });
     }
@@ -441,6 +659,35 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
+    /**
+     * 네비게이션 메뉴 아이템을 눌렀을 때 호출
+     */
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        Intent intent = null;
+
+        // 아이템에 해당하는 액티비티로 전환
+        if (id == R.id.nav_search) {
+            intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("searchType", "normal");
+        } else if (id == R.id.nav_route) {
+            intent = new Intent(this, DirectionsActivity.class);
+        } else if (id == R.id.nav_restaurants) {
+            intent = new Intent(this, RestaurantsActivity.class);
+        } else if (id == R.id.nav_share) {
+            intent = new Intent(this, ShareActivity.class);
+        }
+        startActivity(intent);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
     @Override
     public void onClick(View v) {
         Intent intent = null;
@@ -459,16 +706,17 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.fab_pick:
                 intent = new Intent(this, PickActivity.class);
+                break;
         }
         startActivity(intent);
     }
+
 
     public static class AddressFragment extends Fragment {
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_address, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.fragment_address, container, false);
         }
     }
 
@@ -490,17 +738,19 @@ public class MainActivity extends AppCompatActivity
             Bundle args = getArguments();
 
             String name = args.getString("name");
-            String placeType = null;
+            String placeType = args.getString("placeType");
 
-            switch (args.getString("placeType")) {
-                case "bikes":
-                    placeType = "따릉이 대여소";
-                    break;
-                case "restaurants":
-                    placeType = "음식점";
-                    break;
-                case "bathrooms":
-                    placeType = "화장실";
+            if (placeType != null) {
+                switch (placeType) {
+                    case "bikes":
+                        placeType = "따릉이 대여소";
+                        break;
+                    case "restaurants":
+                        placeType = "음식점";
+                        break;
+                    case "bathrooms":
+                        placeType = "화장실";
+                }
             }
 
             String address = args.getString("address");
@@ -520,6 +770,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }
     }
+
 
     private void showAddressFragment() {
         AddressFragment addressFragment = new AddressFragment();

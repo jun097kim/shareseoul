@@ -14,12 +14,21 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:name="kr.or.hanium.shareseoul.activities.PickActivity"
+            android:label="@string/title_activity_pick"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="kr.or.hanium.shareseoul.activities.MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name="kr.or.hanium.shareseoul.activities.DirectionsActivity"
             android:label="@string/title_activity_route"
@@ -59,16 +68,6 @@
             android:name="kr.or.hanium.shareseoul.activities.RestaurantsActivity"
             android:label="@string/title_activity_restaurants"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="kr.or.hanium.shareseoul.activities.PickActivity"
-            android:label="@string/title_activity_pick"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name="kr.or.hanium.shareseoul.activities.SearchActivity"
             android:label="@string/title_activity_search"

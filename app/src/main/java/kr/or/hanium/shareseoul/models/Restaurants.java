@@ -32,6 +32,10 @@ public class Restaurants {
         public Items getItems() {
             return items;
         }
+
+        public void setItems(Items items) {
+            this.items = items;
+        }
     }
 
     public class Items {
@@ -41,6 +45,10 @@ public class Restaurants {
 
         public List<Item> getItem() {
             return item;
+        }
+
+        public void setItem(List<Item> item) {
+            this.item = item;
         }
     }
 
