@@ -1,5 +1,6 @@
 package kr.or.hanium.shareseoul.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -123,6 +125,8 @@ public class MainActivity extends AppCompatActivity
 
     private PlaceMarker placeMarker;  // 클릭한 마커
 
+    private BackPressCloseHandler backPressCloseHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,6 +175,7 @@ public class MainActivity extends AppCompatActivity
         AddressFragment addressFragment = new AddressFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, addressFragment).commit();
+        setFabMargin("address");
 
         // 뷰에 리스너 설정하기
         TextView tvSearch = (TextView) findViewById(R.id.tv_search);
@@ -227,6 +232,9 @@ public class MainActivity extends AppCompatActivity
                         .build();
                 bathroomsService = retrofit.create(BathroomsService.class);
         }
+
+
+        backPressCloseHandler = new BackPressCloseHandler(this);
     }
 
     /**
@@ -247,7 +255,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+//            super.onBackPressed();
+            backPressCloseHandler.onBackPressed();
         }
     }
 
@@ -781,6 +790,8 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, addressFragment);
         transaction.commit();
+
+        setFabMargin("address");
     }
 
     private void showPlaceFragment(String address) {
@@ -795,5 +806,57 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, placeFragment);
         transaction.commit();
+
+        setFabMargin("place");
+    }
+
+
+    private void setFabMargin(String type) {
+        switch (type) {
+            case "address":
+                setFabMargin(160, 330);
+                break;
+            case "place":
+                setFabMargin(240, 410);
+        }
+    }
+
+    private void setFabMargin(int pickFABMarginRight, int myLocationFabMarginRight) {
+        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
+        FloatingActionButton fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
+
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fabPick.getLayoutParams();
+        params.setMargins(0, 0, 20, pickFABMarginRight);
+
+        CoordinatorLayout.LayoutParams params1 = (CoordinatorLayout.LayoutParams) fabMyLocation.getLayoutParams();
+        params1.setMargins(0, 0, 20, myLocationFabMarginRight);
+    }
+
+
+    private class BackPressCloseHandler {
+        private long backKeyPressedTime = 0;
+        private Toast toast;
+        private Activity activity;
+
+        private BackPressCloseHandler(Activity context) {
+            this.activity = context;
+        }
+
+        private void onBackPressed() {
+            if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+                backKeyPressedTime = System.currentTimeMillis();
+                showGuide();
+                return;
+            }
+            if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+                activity.finish();
+                toast.cancel();
+            }
+        }
+
+        private void showGuide() {
+            toast = Toast.makeText(activity, "종료하려면 한번 더 누르세요.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 }

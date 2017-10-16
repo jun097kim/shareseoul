@@ -30,7 +30,6 @@
     <include layout="@layout/content_main" />
 
     <LinearLayout
-        android:id="@+id/bottom_sheet_f"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -50,32 +49,26 @@
 
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_my_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:backgroundTint="#ffffff"
+        android:elevation="0dp"
+        app:borderWidth="0dp"
+        app:srcCompat="@drawable/ic_fab_my_location" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_pick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="50dp"
+        android:layout_gravity="bottom|end"
         android:elevation="0dp"
-        app:layout_anchor="@id/bottom_sheet_f"
-        app:layout_anchorGravity="top|end"
-        app:srcCompat="@drawable/ic_fab_pick"
-        app:useCompatPadding="true" />
+        app:srcCompat="@drawable/ic_fab_pick" />
     <!--
     tint: 아이콘 색상
     backgroundTint: 배경 색상
     useCompatPadding: 다른 API 버전 간에 padding 일관성 유지
     -->
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_my_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:backgroundTint="#ffffff"
-        android:elevation="0dp"
-        app:borderWidth="0dp"
-        app:layout_anchor="@id/fab_pick"
-        app:layout_anchorGravity="top|end"
-        app:useCompatPadding="true" />
 
 </android.support.design.widget.CoordinatorLayout>
