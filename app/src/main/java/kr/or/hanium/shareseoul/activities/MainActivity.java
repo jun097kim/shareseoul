@@ -39,7 +39,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity
         OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<PlaceMarker>,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
@@ -330,11 +328,6 @@ public class MainActivity extends AppCompatActivity
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(mLastKnownLocation.getLatitude(),
                                     mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                }
-
-                @Override
-                public void onLocationAvailability(LocationAvailability locationAvailability) {
-                    super.onLocationAvailability(locationAvailability);
                 }
             };
 
