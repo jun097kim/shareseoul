@@ -37,10 +37,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -56,7 +58,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity
     // 액티비티 상태 저장을 위한 키
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+
+    private static final int REQUEST_CHECK_SETTINGS = 100;
 
 
     private String userEmail;
@@ -313,29 +316,29 @@ public class MainActivity extends AppCompatActivity
         /*
          * 장치의 가장 최근 위치를 가져오고, 위치를 사용할 수 없는 경우 null일 수 있다.
          */
-        try {
-            if (mLocationPermissionGranted) {
-                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // 지도의 카메라 위치를 장치의 현재 위치로 설정
-                            mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                        } else {
-                            Log.d(TAG, "현재 위치가 null 입니다. 기본 위치를 사용합니다.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
+        if (mLocationPermissionGranted) {
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            LocationCallback locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    // 지도의 카메라 위치를 장치의 현재 위치로 설정
+                    mLastKnownLocation = locationResult.getLastLocation();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(mLastKnownLocation.getLatitude(),
+                                    mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                }
+
+                @Override
+                public void onLocationAvailability(LocationAvailability locationAvailability) {
+                    super.onLocationAvailability(locationAvailability);
+                }
+            };
+
+            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
         }
     }
 
@@ -408,6 +411,7 @@ public class MainActivity extends AppCompatActivity
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
+        // 위치 설정이 켜져있는 경우
         task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
@@ -422,31 +426,51 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        // 위치 설정이 꺼져있는 경우
         task.addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 int statusCode = ((ApiException) e).getStatusCode();
                 switch (statusCode) {
-                    case CommonStatusCodes.RESOLUTION_REQUIRED:
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
+                            // startResolutionForResult()를 호출하여 다이얼로그를 띄우고,
+                            // onActivityResult()에서 결과를 확인한다.
                             ResolvableApiException resolvable = (ResolvableApiException) e;
-                            resolvable.startResolutionForResult(MainActivity.this,
-                                    3);
+                            resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException sendEx) {
                             // Ignore the error.
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
+                        // 위치 설정을 수정할 방법이 없어서 다이얼로그를 띄우지 않음
                         break;
                 }
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // 권한 요청 다이얼로그 띄우기
+                        getLocationPermission();
+
+                        // My Location 계층 활성화
+                        updateLocationUI();
+
+                        // 장치의 현재 위치를 얻고 지도에 설정하기
+                        getDeviceLocation();
+                        break;
+                }
+                break;
+        }
+    }
 
     class ClusterRenderer extends DefaultClusterRenderer<PlaceMarker> {
         String picked;
