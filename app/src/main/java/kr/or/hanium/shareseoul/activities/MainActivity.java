@@ -1,5 +1,6 @@
 package kr.or.hanium.shareseoul.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -310,6 +311,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * 장치의 현재 위치 얻어서 지도 카메라 위치시키기
      */
+    @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
         /*
          * 장치의 가장 최근 위치를 가져오고, 위치를 사용할 수 없는 경우 null일 수 있다.
@@ -319,6 +321,7 @@ public class MainActivity extends AppCompatActivity
             locationRequest.setInterval(10000);
             locationRequest.setFastestInterval(5000);
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setNumUpdates(1);
 
             LocationCallback locationCallback = new LocationCallback() {
                 @Override
