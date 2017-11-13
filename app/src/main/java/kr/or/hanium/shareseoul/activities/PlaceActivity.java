@@ -3,15 +3,14 @@ package kr.or.hanium.shareseoul.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,15 +33,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
+public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, RadioGroup.OnCheckedChangeListener {
     private int userId;
 
     private String placeName;
     private String placeId;
 
-    private ArrayList<LinearLayout> llRating = new ArrayList<>(3);
-    private ArrayList<ImageView> ivRating = new ArrayList<>(3);
-    private ArrayList<TextView> tvRating = new ArrayList<>(3);
+    private ArrayList<RadioButton> rbRating = new ArrayList<>(3);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,21 +104,12 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
         DetailsAdapter adapter = new DetailsAdapter(detailNames, detailValues);
         rvDetails.setAdapter(adapter);
 
-        llRating.add((LinearLayout) findViewById(R.id.ll_rating_good));
-        llRating.add((LinearLayout) findViewById(R.id.ll_rating_fair));
-        llRating.add((LinearLayout) findViewById(R.id.ll_rating_poor));
+        RadioGroup rgRating = (RadioGroup) findViewById(R.id.rg_rating);
+        rgRating.setOnCheckedChangeListener(this);
 
-        llRating.get(0).setOnClickListener(this);
-        llRating.get(1).setOnClickListener(this);
-        llRating.get(2).setOnClickListener(this);
-
-        ivRating.add((ImageView) findViewById(R.id.iv_rating_good));
-        ivRating.add((ImageView) findViewById(R.id.iv_rating_fair));
-        ivRating.add((ImageView) findViewById(R.id.iv_rating_poor));
-
-        tvRating.add((TextView) findViewById(R.id.tv_rating_good));
-        tvRating.add((TextView) findViewById(R.id.tv_rating_fair));
-        tvRating.add((TextView) findViewById(R.id.tv_rating_poor));
+        rbRating.add((RadioButton) findViewById(R.id.rb_rating_good));
+        rbRating.add((RadioButton) findViewById(R.id.rb_rating_fair));
+        rbRating.add((RadioButton) findViewById(R.id.rb_rating_poor));
     }
 
     @Override
@@ -139,14 +127,21 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
                 intent.putExtra("placeName", placeName);
                 startActivity(intent);
                 break;
-            case R.id.ll_rating_good:
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        switch (i) {
+            case R.id.rb_rating_poor:
                 ratingCall(0);
                 break;
-            case R.id.ll_rating_fair:
+            case R.id.rb_rating_fair:
                 ratingCall(1);
                 break;
-            case R.id.ll_rating_poor:
+            case R.id.rb_rating_good:
                 ratingCall(2);
+                break;
         }
     }
 
@@ -163,9 +158,6 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
             public void onResponse(Call<Rating> call, Response<Rating> response) {
                 if (response.body().getSuccess()) {
                     Toast.makeText(PlaceActivity.this, "평점이 등록되었습니다.", Toast.LENGTH_SHORT).show();
-
-                    ivRating.get(myRating).setColorFilter(Color.parseColor("#FF5722"));
-                    tvRating.get(myRating).setTextColor(Color.parseColor("#FF5722"));
                 } else {
                     Toast.makeText(PlaceActivity.this, "오류가 발생했습니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
                 }
@@ -176,7 +168,6 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
                 Toast.makeText(PlaceActivity.this, "인터넷 연결이 불안정합니다.", Toast.LENGTH_SHORT).show();
             }
         });
-        Toast.makeText(this, "로그인 후 이용 가능합니다.", Toast.LENGTH_SHORT).show();
     }
 
     @Override

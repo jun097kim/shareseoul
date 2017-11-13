@@ -129,76 +129,50 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <RadioGroup
+                    android:id="@+id/rg_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:id="@+id/ll_rating_good"
+                    <RadioButton
+                        android:id="@+id/rb_rating_good"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="match_parent"
+                        android:button="@null"
+                        android:drawableTint="@color/selector_rating"
+                        android:drawableTop="@drawable/ic_rating_good"
+                        android:gravity="center_horizontal|top"
+                        android:text="만족"
+                        android:textColor="@color/selector_rating" />
 
-                        <ImageView
-                            android:id="@+id/iv_rating_good"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            app:srcCompat="@drawable/ic_rating_good" />
-
-                        <TextView
-                            android:id="@+id/tv_rating_good"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="만족" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/ll_rating_fair"
+                    <RadioButton
+                        android:id="@+id/rb_rating_fair"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginLeft="15dp"
-                        android:orientation="vertical">
+                        android:button="@null"
+                        android:drawableTint="@color/selector_rating"
+                        android:drawableTop="@drawable/ic_rating_fair"
+                        android:gravity="center_horizontal|top"
+                        android:text="평범"
+                        android:textColor="@color/selector_rating" />
 
-                        <ImageView
-                            android:id="@+id/iv_rating_fair"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            app:srcCompat="@drawable/ic_rating_fair" />
-
-                        <TextView
-                            android:id="@+id/tv_rating_fair"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="평범" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/ll_rating_poor"
+                    <RadioButton
+                        android:id="@+id/rb_rating_poor"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginLeft="15dp"
-                        android:orientation="vertical">
+                        android:button="@null"
+                        android:drawableTint="@color/selector_rating"
+                        android:drawableTop="@drawable/ic_rating_poor"
+                        android:gravity="center_horizontal|top"
+                        android:text="별로"
+                        android:textColor="@color/selector_rating" />
 
-                        <ImageView
-                            android:id="@+id/iv_rating_poor"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            app:srcCompat="@drawable/ic_rating_poor" />
+                </RadioGroup>
 
-                        <TextView
-                            android:id="@+id/tv_rating_poor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="별로" />
-                    </LinearLayout>
-
-                </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>

@@ -1,5 +1,6 @@
 package kr.or.hanium.shareseoul.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,16 +24,21 @@ public class ShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_share);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        LocationTemplate params = LocationTemplate.newBuilder("성남시 분당구 판교역로 235",
-                ContentObject.newBuilder("카카오 판교오피스",
+
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("name");
+        String address = intent.getStringExtra("address");
+
+        LocationTemplate params = LocationTemplate.newBuilder(address,
+                ContentObject.newBuilder(name,
                         "http://www.kakaocorp.com/images/logo/og_daumkakao_151001.png",
                         LinkObject.newBuilder()
                                 .setWebUrl("https://developers.kakao.com")
                                 .setMobileWebUrl("https://developers.kakao.com")
                                 .build())
-                        .setDescrption("카카오 판교오피스 위치입니다.")
+                        .setDescrption(address)
                         .build())
-                .setAddressTitle("카카오 판교오피스")
+                .setAddressTitle(name)
                 .build();
 
         KakaoLinkService.getInstance().sendDefault(this, params, new ResponseCallback<KakaoLinkResponse>() {

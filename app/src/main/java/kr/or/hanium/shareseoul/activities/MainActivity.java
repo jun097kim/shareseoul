@@ -747,6 +747,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public static class PlaceFragment extends Fragment implements View.OnClickListener {
+        String address;
         String placeId;
         String placeName;
 
@@ -780,7 +781,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
-            String address = args.getString("address");
+            address = args.getString("address");
             placeId = args.getString("placeId");
             placeName = args.getString("name");
 
@@ -798,6 +799,11 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra("placeId", placeId);
             intent.putExtra("placeName", placeName);
             startActivity(intent);
+
+//            Intent intent = new Intent(getActivity(), ShareActivity.class);
+//            intent.putExtra("name", placeName);
+//            intent.putExtra("address", address);
+//            startActivity(intent);
         }
     }
 
@@ -838,12 +844,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setFabMargin(int pickFABMarginRight, int myLocationFabMarginRight) {
+    private void setFabMargin(int pickFabMarginRight, int myLocationFabMarginRight) {
         FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
         FloatingActionButton fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
 
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fabPick.getLayoutParams();
-        params.setMargins(0, 0, 20, pickFABMarginRight);
+        params.setMargins(0, 0, 20, pickFabMarginRight);
 
         CoordinatorLayout.LayoutParams params1 = (CoordinatorLayout.LayoutParams) fabMyLocation.getLayoutParams();
         params1.setMargins(0, 0, 20, myLocationFabMarginRight);
