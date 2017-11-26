@@ -26,16 +26,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
 
-        Button btnLogin = (Button) findViewById(R.id.btn_login);
+        Button btnLogin = findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
 
-        Button btnToRegister = (Button) findViewById(R.id.btn_to_register);
+        Button btnToRegister = findViewById(R.id.btn_to_register);
         btnToRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,8 +47,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        EditText etEmail = (EditText) findViewById(R.id.et_email);
-        EditText etPassword = (EditText) findViewById(R.id.et_password);
+        EditText etEmail = findViewById(R.id.et_email);
+        EditText etPassword = findViewById(R.id.et_password);
 
         final String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();

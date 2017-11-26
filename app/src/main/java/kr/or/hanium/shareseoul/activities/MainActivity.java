@@ -2,6 +2,7 @@ package kr.or.hanium.shareseoul.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -127,11 +128,11 @@ public class MainActivity extends AppCompatActivity
 
     private PlaceMarker placeMarker;  // 클릭한 마커
 
-    private BackPressCloseHandler backPressCloseHandler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i("Lifecycle", "onCreate()");
 
         // savedInstanceState에서 위치와 카메라 위치를 가져온다.
         if (savedInstanceState != null) {
@@ -152,9 +153,9 @@ public class MainActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 
 
         // 네비게이션 헤더(로그인 메뉴)에 리스너 설정
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
 
         RelativeLayout navLogin = headerView.findViewById(R.id.nav_login);
@@ -180,9 +181,9 @@ public class MainActivity extends AppCompatActivity
         setFabMargin("address");
 
         // 뷰에 리스너 설정하기
-        TextView tvSearch = (TextView) findViewById(R.id.tv_search);
-        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
-        FloatingActionButton fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        TextView tvSearch = findViewById(R.id.tv_search);
+        FloatingActionButton fabPick = findViewById(R.id.fab_pick);
+        FloatingActionButton fabMyLocation = findViewById(R.id.fab_my_location);
 
         tvSearch.setOnClickListener(this);
         fabPick.setOnClickListener(this);
@@ -211,6 +212,8 @@ public class MainActivity extends AppCompatActivity
         Retrofit retrofit;
         switch (picked) {
             case "bikes":
+                tvSearch.setText("따릉이 대여소 검색");
+
                 // 따릉이 대여소 API
                 retrofit = new Retrofit.Builder()
                         .baseUrl(BikesService.BASE_URL)
@@ -219,6 +222,8 @@ public class MainActivity extends AppCompatActivity
                 bikesService = retrofit.create(BikesService.class);
                 break;
             case "restaurants":
+                tvSearch.setText("음식점 검색");
+
                 // 음식점 API
                 retrofit = new Retrofit.Builder()
                         .baseUrl(RestaurantsService.BASE_URL)
@@ -227,6 +232,8 @@ public class MainActivity extends AppCompatActivity
                 restaurantsService = retrofit.create(RestaurantsService.class);
                 break;
             case "bathrooms":
+                tvSearch.setText("화장실 검색");
+
                 // 화장실 API
                 retrofit = new Retrofit.Builder()
                         .baseUrl(BathroomsService.BASE_URL)
@@ -234,9 +241,6 @@ public class MainActivity extends AppCompatActivity
                         .build();
                 bathroomsService = retrofit.create(BathroomsService.class);
         }
-
-
-        backPressCloseHandler = new BackPressCloseHandler(this);
     }
 
     /**
@@ -253,12 +257,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-//            super.onBackPressed();
-            backPressCloseHandler.onBackPressed();
+            super.onBackPressed();
         }
     }
 
@@ -520,7 +523,7 @@ public class MainActivity extends AppCompatActivity
                 bestMatch = matches.get(0);
             }
 
-            TextView tvAddress = (TextView) findViewById(R.id.tv_place);
+            TextView tvAddress = findViewById(R.id.tv_place);
 
             if (bestMatch != null) {
                 // getSubLocality(): 시군구, getThoroughfare(): 읍면동|도로명
@@ -697,49 +700,62 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Intent intent = null;
+
+        Intent intent = new Intent();
+        String s = null;
 
         // 아이템에 해당하는 액티비티로 전환
         if (id == R.id.nav_search) {
-            intent = new Intent(this, SearchActivity.class);
             intent.putExtra("searchType", "normal");
+            s = "Search";
         } else if (id == R.id.nav_route) {
-            intent = new Intent(this, DirectionsActivity.class);
+            s = "Directions";
         } else if (id == R.id.nav_restaurants) {
-            intent = new Intent(this, RestaurantsActivity.class);
+            s = "Restaurants";
         } else if (id == R.id.nav_share) {
-            intent = new Intent(this, ShareActivity.class);
+            s = "Share";
         }
+
+        ComponentName name = new ComponentName("kr.or.hanium.shareseoul",
+                "kr.or.hanium.shareseoul.activities." + s + "Activity");
+        intent.setComponent(name);
         startActivity(intent);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
-        switch (v.getId()) {
-            case R.id.tv_search:
-                LatLng target = mMap.getCameraPosition().target;
-                double latitude = target.latitude;
-                double longitude = target.longitude;
+        Intent intent = new Intent();
+        String s = null;
 
-                intent = new Intent(this, BikesActivity.class);
-                intent.putExtra("latitude", latitude);
-                intent.putExtra("longitude", longitude);
-                break;
-            case R.id.nav_login:
-                intent = new Intent(this, LoginActivity.class);
-                break;
-            case R.id.fab_pick:
-                intent = new Intent(this, PickActivity.class);
-                break;
+        if (v.getId() == R.id.fab_pick) {
+            finish();
+        } else {
+            switch (v.getId()) {
+                case R.id.tv_search:
+                    LatLng target = mMap.getCameraPosition().target;
+                    double latitude = target.latitude;
+                    double longitude = target.longitude;
+
+                    s = "Bikes";
+                    intent.putExtra("picked", picked);
+                    intent.putExtra("latitude", latitude);
+                    intent.putExtra("longitude", longitude);
+                    break;
+                case R.id.nav_login:
+                    s = "Login";
+                    break;
+            }
+
+            ComponentName name = new ComponentName("kr.or.hanium.shareseoul",
+                    "kr.or.hanium.shareseoul.activities." + s + "Activity");
+            intent.setComponent(name);
+            startActivity(intent);
         }
-        startActivity(intent);
     }
-
 
     public static class AddressFragment extends Fragment {
         @Nullable
@@ -750,6 +766,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public static class PlaceFragment extends Fragment implements View.OnClickListener {
+        String placeType;
         String address;
         String placeId;
         String placeName;
@@ -770,17 +787,17 @@ public class MainActivity extends AppCompatActivity
 
             Bundle args = getArguments();
 
-            String placeType = args.getString("placeType");
+            placeType = args.getString("placeType");
             if (placeType != null) {
                 switch (placeType) {
                     case "bikes":
-                        placeType = "따릉이 대여소";
+                        tvPlaceType.setText("따릉이 대여소");
                         break;
                     case "restaurants":
-                        placeType = "음식점";
+                        tvPlaceType.setText("음식점");
                         break;
                     case "bathrooms":
-                        placeType = "화장실";
+                        tvPlaceType.setText("화장실");
                 }
             }
 
@@ -790,7 +807,6 @@ public class MainActivity extends AppCompatActivity
 
 
             tvPlace.setText(placeName);
-            tvPlaceType.setText(placeType);
             tvAddress.setText(address);
 
             return rootView;
@@ -799,6 +815,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onClick(View view) {
             Intent intent = new Intent(getActivity(), PlaceActivity.class);
+            intent.putExtra("placeType", placeType);
             intent.putExtra("placeId", placeId);
             intent.putExtra("placeName", placeName);
             startActivity(intent);
@@ -848,41 +865,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFabMargin(int pickFabMarginRight, int myLocationFabMarginRight) {
-        FloatingActionButton fabPick = (FloatingActionButton) findViewById(R.id.fab_pick);
-        FloatingActionButton fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        FloatingActionButton fabPick = findViewById(R.id.fab_pick);
+        FloatingActionButton fabMyLocation = findViewById(R.id.fab_my_location);
 
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fabPick.getLayoutParams();
         params.setMargins(0, 0, 20, pickFabMarginRight);
 
         CoordinatorLayout.LayoutParams params1 = (CoordinatorLayout.LayoutParams) fabMyLocation.getLayoutParams();
         params1.setMargins(0, 0, 20, myLocationFabMarginRight);
-    }
-
-
-    private class BackPressCloseHandler {
-        private long backKeyPressedTime = 0;
-        private Toast toast;
-        private Activity activity;
-
-        private BackPressCloseHandler(Activity context) {
-            this.activity = context;
-        }
-
-        private void onBackPressed() {
-            if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-                backKeyPressedTime = System.currentTimeMillis();
-                showGuide();
-                return;
-            }
-            if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
-                activity.finish();
-                toast.cancel();
-            }
-        }
-
-        private void showGuide() {
-            toast = Toast.makeText(activity, "종료하려면 한번 더 누르세요.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
     }
 }

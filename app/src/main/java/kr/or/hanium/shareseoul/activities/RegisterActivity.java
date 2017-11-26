@@ -25,21 +25,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         overridePendingTransition(0, 0);  // 전환 애니메이션 없애기
 
-        Button btnRegister = (Button) findViewById(R.id.btn_register);
+        Button btnRegister = findViewById(R.id.btn_register);
         btnRegister.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        EditText etEmail = (EditText) findViewById(R.id.et_email);
-        EditText etPassword = (EditText) findViewById(R.id.et_password);
-        EditText etPasswordConfirm = (EditText) findViewById(R.id.et_password_confirm);
+        EditText etEmail = findViewById(R.id.et_email);
+        EditText etPassword = findViewById(R.id.et_password);
+        EditText etPasswordConfirm = findViewById(R.id.et_password_confirm);
 
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();

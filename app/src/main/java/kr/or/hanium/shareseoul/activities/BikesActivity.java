@@ -29,16 +29,17 @@ public class BikesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bikes);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
         Intent intent = getIntent();
+        String picked = intent.getStringExtra("picked");
         double latitude = intent.getDoubleExtra("latitude", 0);
         double longitude = intent.getDoubleExtra("longitude", 0);
 
-        final RecyclerView rvBikes = (RecyclerView) findViewById(R.id.rv_bikes);
+        final RecyclerView rvBikes = findViewById(R.id.rv_bikes);
 
         // 리사이클러뷰에 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -68,8 +69,22 @@ public class BikesActivity extends AppCompatActivity {
             }
         });
 
-        final FloatingSearchView svBike = (FloatingSearchView) findViewById(R.id.sv_bike);
-        AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
+
+        final FloatingSearchView svBike = findViewById(R.id.sv_bike);
+
+        switch (picked) {
+            case "bikes":
+                svBike.setSearchHint("따릉이 대여소 검색");
+                break;
+            case "restaurants":
+                svBike.setSearchHint("음식점 검색");
+                break;
+            case "bathrooms":
+                svBike.setSearchHint("화장실 검색");
+                break;
+        }
+
+        AppBarLayout mAppBar = findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {

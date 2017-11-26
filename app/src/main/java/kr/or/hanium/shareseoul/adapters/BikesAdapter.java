@@ -59,7 +59,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(activity, PlaceActivity.class);
-                intent.putExtra("placeType", "bike");
+                intent.putExtra("placeType", "bikes");
                 intent.putExtra("placeId", bikes.get(position).getId());
                 intent.putExtra("placeCount", bikes.get(position).getCount());
                 activity.startActivity(intent);

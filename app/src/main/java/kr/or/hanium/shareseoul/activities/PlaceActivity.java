@@ -60,8 +60,9 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
 
 
         // 뷰에 리스너 연결하기
-        Button btnSetOrigin = (Button) findViewById(R.id.btn_set_origin);
-        Button btnSetDestination = (Button) findViewById(R.id.btn_set_destination);
+        Button btnSetOrigin = findViewById(R.id.btn_set_origin);
+        Button btnSetDestination = findViewById(R.id.btn_set_destination);
+        TextView tvRating = findViewById(R.id.tv_rating);
 
         btnSetOrigin.setOnClickListener(this);
         btnSetDestination.setOnClickListener(this);
@@ -69,15 +70,16 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Intent intent = getIntent();
 
+        String placeType = intent.getStringExtra("placeType");
         placeName = intent.getStringExtra("placeName");
         placeId = intent.getStringExtra("placeId");
 
-        TextView tvPlaceName = (TextView) findViewById(R.id.place_name);
+        TextView tvPlaceName = findViewById(R.id.place_name);
         tvPlaceName.setText(placeName);
 
 
         // 장소 세부정보 리사이클러뷰
-        RecyclerView rvDetails = (RecyclerView) findViewById(R.id.rv_details);
+        RecyclerView rvDetails = findViewById(R.id.rv_details);
 
         // 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -87,24 +89,33 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
         String[] detailNames = res.getStringArray(R.array.bike_detail_names);
         String[] detailValues = res.getStringArray(R.array.bike_detail_values);
 
-        String placeType = intent.getStringExtra("placeType");
-
         if (placeType != null) {
+            StringBuilder text = new StringBuilder("이 ");
+
             switch (placeType) {
-                case "bike":
+                case "bikes":
+                    text.append("따릉이 대여소");
+
                     detailValues[0] = Integer.toString(intent.getIntExtra("placeId", 0));
                     detailValues[1] = Integer.toString(intent.getIntExtra("placeCount", 0));
+
                     break;
-                case "restaurant":
+                case "restaurants":
+                    text.append("음식점");
                     break;
-                case "bathroom":
+                case "bathrooms":
+                    text.append("화장실");
+                    break;
             }
+
+            text.append(" 어떠셨나요?");
+            tvRating.setText(text);
         }
 
         DetailsAdapter adapter = new DetailsAdapter(detailNames, detailValues);
         rvDetails.setAdapter(adapter);
 
-        RadioGroup rgRating = (RadioGroup) findViewById(R.id.rg_rating);
+        RadioGroup rgRating = findViewById(R.id.rg_rating);
         rgRating.setOnCheckedChangeListener(this);
 
         rbRating.add((RadioButton) findViewById(R.id.rb_rating_good));

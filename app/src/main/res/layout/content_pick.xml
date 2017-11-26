@@ -89,16 +89,6 @@
                 android:padding="5dp"
                 android:text="화장실" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_directions"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ll_restaurants"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="10dp"
-            android:text="길찾기" />
     </RelativeLayout>
 
 </RelativeLayout>

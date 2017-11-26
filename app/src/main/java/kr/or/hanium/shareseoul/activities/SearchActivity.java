@@ -32,13 +32,13 @@ public class SearchActivity extends AppCompatActivity {
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
-        final RecyclerView rvSearch = (RecyclerView) findViewById(R.id.rv_search);
+        final RecyclerView rvSearch = findViewById(R.id.rv_search);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvSearch.setLayoutManager(linearLayoutManager);
 
-        final FloatingSearchView mSearchView = (FloatingSearchView) findViewById(R.id.sv_bike);
+        final FloatingSearchView mSearchView = findViewById(R.id.sv_bike);
 
-        AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
+        AppBarLayout mAppBar = findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {

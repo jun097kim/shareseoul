@@ -1,7 +1,6 @@
 package kr.or.hanium.shareseoul.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -35,8 +35,8 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
     @Override
     public void onBindViewHolder(RestaurantsViewHolder holder, int position) {
-//        holder.mTextView.setText(mItem.get(position).getName());
-//        Picasso.with(mContext).load(mItem.get(position).getImageUrl()).into(holder.mImageView);
+        holder.mTextView.setText(mItem.get(position).getName());
+        Picasso.with(mContext).load(mItem.get(position).getFirstimage2()).into(holder.mImageView);
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         int color = generator.getRandomColor();
@@ -44,7 +44,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
                 .beginConfig()
                     .bold()
                 .endConfig()
-                .buildRect("5", Color.parseColor("#4caf50"));
+                .buildRect("5", color);    // Color.parseColor("#4caf50")
         holder.ivRating.setImageDrawable(drawable);
     }
 

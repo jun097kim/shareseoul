@@ -38,7 +38,7 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directions);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);      // 툴바 Up 버튼 추가
@@ -46,9 +46,9 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
-        ImageButton swapBtn = (ImageButton) findViewById(R.id.swap_btn);
-        mOrigin = (TextView) findViewById(R.id.origin);
-        mDestination = (TextView) findViewById(R.id.destination);
+        ImageButton swapBtn = findViewById(R.id.swap_btn);
+        mOrigin = findViewById(R.id.origin);
+        mDestination = findViewById(R.id.destination);
 
         swapBtn.setOnClickListener(this);
         mOrigin.setOnClickListener(this);
@@ -61,7 +61,7 @@ public class DirectionsActivity extends AppCompatActivity implements View.OnClic
                 .build();
         mDirectionsService = retrofit.create(DirectionsService.class);
 
-        rvDirections = (RecyclerView) findViewById(R.id.rv_directions);
+        rvDirections = findViewById(R.id.rv_directions);
 
         // 레이아웃 매니저 설정
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

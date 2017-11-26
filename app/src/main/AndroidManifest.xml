@@ -16,7 +16,6 @@
         <activity
             android:name="kr.or.hanium.shareseoul.activities.PickActivity"
             android:label="@string/title_activity_pick"
-            android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
