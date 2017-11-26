@@ -47,7 +47,6 @@
             android:background="@color/colorPrimary" />
     </LinearLayout>
 
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_my_location"
         android:layout_width="wrap_content"
@@ -57,14 +56,6 @@
         android:elevation="0dp"
         app:borderWidth="0dp"
         app:srcCompat="@drawable/ic_fab_my_location" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_pick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:elevation="0dp"
-        app:srcCompat="@drawable/ic_fab_pick" />
     <!--
     tint: 아이콘 색상
     backgroundTint: 배경 색상

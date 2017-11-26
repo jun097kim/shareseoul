@@ -35,12 +35,14 @@
         android:text="로그인" />
 
     <TextView
-        android:id="@+id/btn_find_password"
-        android:layout_width="match_parent"
+        android:id="@+id/btn_to_register"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginTop="15dp"
-        android:gravity="center"
-        android:text="비밀번호를 잊으셨나요?" />
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="새로운 모짝계정 만들기" />
 
     <View
         android:layout_width="match_parent"
@@ -49,13 +51,8 @@
         android:layout_marginTop="30dp"
         android:background="?android:attr/dividerVertical" />
 
-    <Button
-        android:id="@+id/btn_to_register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:text="새로운 모짝계정 만들기" />
-
+    <com.kakao.usermgmt.LoginButton
+        android:id="@+id/com_kakao_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

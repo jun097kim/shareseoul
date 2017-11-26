@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import kr.or.hanium.shareseoul.R;
@@ -35,7 +36,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Button btnLogin = findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
 
-        Button btnToRegister = findViewById(R.id.btn_to_register);
+        TextView btnToRegister = findViewById(R.id.btn_to_register);
         btnToRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

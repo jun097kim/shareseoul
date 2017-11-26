@@ -12,35 +12,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.PickActivity"
+            android:name=".activities.PickActivity"
             android:label="@string/title_activity_pick"
             android:theme="@style/AppTheme.NoActionBar">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="kr.or.hanium.shareseoul.activities.MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="kr.or.hanium.shareseoul.activities.DirectionsActivity"
-            android:label="@string/title_activity_route"
-            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="kr.or.hanium.shareseoul.activities.MainActivity" />
-            <!-- Android 4.1 (API level 16) 이전 -->
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -53,34 +34,48 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.LoginActivity"
+            android:name=".activities.MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.DirectionsActivity"
+            android:label="@string/title_activity_route"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <!-- parentActivityName: Up 버튼을 눌렀을 때, 이동할 부모 액티비티 -->
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="kr.or.hanium.shareseoul.activities.MainActivity" />
+            <!-- Android 4.1 (API level 16) 이전 -->
+        </activity>
+        <activity
+            android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.BikesActivity"
+            android:name=".activities.BikesActivity"
             android:label="@string/title_activity_bikes"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.RestaurantsActivity"
+            android:name=".activities.RestaurantsActivity"
             android:label="@string/title_activity_restaurants"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.SearchActivity"
+            android:name=".activities.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="kr.or.hanium.shareseoul.activities.PlaceActivity"
+            android:name=".activities.PlaceActivity"
             android:label="@string/title_activity_place"
-            android:parentActivityName="kr.or.hanium.shareseoul.activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="kr.or.hanium.shareseoul.activities.ShareActivity"
-            android:label="@string/title_activity_share"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data

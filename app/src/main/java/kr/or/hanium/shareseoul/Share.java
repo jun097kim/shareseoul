@@ -1,9 +1,6 @@
-package kr.or.hanium.shareseoul.activities;
+package kr.or.hanium.shareseoul;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.app.Activity;
 
 import com.kakao.kakaolink.v2.KakaoLinkResponse;
 import com.kakao.kakaolink.v2.KakaoLinkService;
@@ -14,21 +11,12 @@ import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 import com.kakao.util.helper.log.Logger;
 
-import kr.or.hanium.shareseoul.R;
+/**
+ * Created by jun097kim on 17. 11. 26.
+ */
 
-public class ShareActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_share);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        Intent intent = getIntent();
-        String name = intent.getStringExtra("name");
-        String address = intent.getStringExtra("address");
-
+public class Share {
+    public Share(Activity activity, String name, String address) {
         LocationTemplate params = LocationTemplate.newBuilder(address,
                 ContentObject.newBuilder(name,
                         "http://www.kakaocorp.com/images/logo/og_daumkakao_151001.png",
@@ -41,7 +29,7 @@ public class ShareActivity extends AppCompatActivity {
                 .setAddressTitle(name)
                 .build();
 
-        KakaoLinkService.getInstance().sendDefault(this, params, new ResponseCallback<KakaoLinkResponse>() {
+        KakaoLinkService.getInstance().sendDefault(activity, params, new ResponseCallback<KakaoLinkResponse>() {
             @Override
             public void onFailure(ErrorResult errorResult) {
                 Logger.e(errorResult.toString());
@@ -53,6 +41,4 @@ public class ShareActivity extends AppCompatActivity {
             }
         });
     }
-
 }
-

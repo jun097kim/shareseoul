@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -73,6 +74,7 @@ import java.util.List;
 import java.util.Set;
 
 import kr.or.hanium.shareseoul.R;
+import kr.or.hanium.shareseoul.Share;
 import kr.or.hanium.shareseoul.interfaces.BathroomsService;
 import kr.or.hanium.shareseoul.interfaces.BikesService;
 import kr.or.hanium.shareseoul.interfaces.RestaurantsService;
@@ -182,11 +184,9 @@ public class MainActivity extends AppCompatActivity
 
         // 뷰에 리스너 설정하기
         TextView tvSearch = findViewById(R.id.tv_search);
-        FloatingActionButton fabPick = findViewById(R.id.fab_pick);
         FloatingActionButton fabMyLocation = findViewById(R.id.fab_my_location);
 
         tvSearch.setOnClickListener(this);
-        fabPick.setOnClickListener(this);
         fabMyLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity
                 createLocationRequest();
             }
         });
-
 
         // 로그인되어 있는지 확인
         TextView tvEmail = headerView.findViewById(R.id.tv_email);
@@ -710,10 +709,6 @@ public class MainActivity extends AppCompatActivity
             s = "Search";
         } else if (id == R.id.nav_route) {
             s = "Directions";
-        } else if (id == R.id.nav_restaurants) {
-            s = "Restaurants";
-        } else if (id == R.id.nav_share) {
-            s = "Share";
         }
 
         ComponentName name = new ComponentName("kr.or.hanium.shareseoul",
@@ -731,30 +726,28 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent();
         String s = null;
 
-        if (v.getId() == R.id.fab_pick) {
-            finish();
-        } else {
-            switch (v.getId()) {
-                case R.id.tv_search:
-                    LatLng target = mMap.getCameraPosition().target;
-                    double latitude = target.latitude;
-                    double longitude = target.longitude;
+        switch (v.getId()) {
+            case R.id.tv_search:
+                LatLng target = mMap.getCameraPosition().target;
+                double latitude = target.latitude;
+                double longitude = target.longitude;
 
-                    s = "Bikes";
-                    intent.putExtra("picked", picked);
-                    intent.putExtra("latitude", latitude);
-                    intent.putExtra("longitude", longitude);
-                    break;
-                case R.id.nav_login:
-                    s = "Login";
-                    break;
-            }
+                if (picked.equals("bikes")) s = "Bikes";
+                else if (picked.equals("restaurants")) s = "Restaurants";
 
-            ComponentName name = new ComponentName("kr.or.hanium.shareseoul",
-                    "kr.or.hanium.shareseoul.activities." + s + "Activity");
-            intent.setComponent(name);
-            startActivity(intent);
+                intent.putExtra("picked", picked);
+                intent.putExtra("latitude", latitude);
+                intent.putExtra("longitude", longitude);
+                break;
+            case R.id.nav_login:
+                s = "Login";
+                break;
         }
+
+        ComponentName name = new ComponentName("kr.or.hanium.shareseoul",
+                "kr.or.hanium.shareseoul.activities." + s + "Activity");
+        intent.setComponent(name);
+        startActivity(intent);
     }
 
     public static class AddressFragment extends Fragment {
@@ -781,9 +774,10 @@ public class MainActivity extends AppCompatActivity
             TextView tvPlace = rootView.findViewById(R.id.tv_place);
             TextView tvPlaceType = rootView.findViewById(R.id.tv_place_type);
             TextView tvAddress = rootView.findViewById(R.id.tv_address);
+            ImageButton ibShare = rootView.findViewById(R.id.ib_share);
 
             bottomSheet.setOnClickListener(this);
-
+            ibShare.setOnClickListener(this);
 
             Bundle args = getArguments();
 
@@ -814,16 +808,19 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(getActivity(), PlaceActivity.class);
-            intent.putExtra("placeType", placeType);
-            intent.putExtra("placeId", placeId);
-            intent.putExtra("placeName", placeName);
-            startActivity(intent);
+            switch (view.getId()) {
+                case R.id.bottom_sheet:
+                    Intent intent = new Intent(getActivity(), PlaceActivity.class);
+                    intent.putExtra("placeType", placeType);
+                    intent.putExtra("placeId", placeId);
+                    intent.putExtra("placeName", placeName);
+                    startActivity(intent);
+                    break;
 
-//            Intent intent = new Intent(getActivity(), ShareActivity.class);
-//            intent.putExtra("name", placeName);
-//            intent.putExtra("address", address);
-//            startActivity(intent);
+                case R.id.ib_share:
+                    new Share(getActivity(), placeName, address);
+                    break;
+            }
         }
     }
 
@@ -839,11 +836,13 @@ public class MainActivity extends AppCompatActivity
 
     private void showPlaceFragment(String address) {
         PlaceFragment placeFragment = new PlaceFragment();
+
         Bundle args = new Bundle();
         args.putString("name", placeMarker.getTitle());
         args.putString("placeType", picked);
         args.putString("placeId", placeMarker.getId());
         args.putString("address", address);
+
         placeFragment.setArguments(args);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -857,21 +856,18 @@ public class MainActivity extends AppCompatActivity
     private void setFabMargin(String type) {
         switch (type) {
             case "address":
-                setFabMargin(160, 330);
+                setFabMargin(160);
                 break;
             case "place":
-                setFabMargin(240, 410);
+                setFabMargin(345);
+                break;
         }
     }
 
-    private void setFabMargin(int pickFabMarginRight, int myLocationFabMarginRight) {
-        FloatingActionButton fabPick = findViewById(R.id.fab_pick);
+    private void setFabMargin(int bottom) {
         FloatingActionButton fabMyLocation = findViewById(R.id.fab_my_location);
 
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fabPick.getLayoutParams();
-        params.setMargins(0, 0, 20, pickFabMarginRight);
-
         CoordinatorLayout.LayoutParams params1 = (CoordinatorLayout.LayoutParams) fabMyLocation.getLayoutParams();
-        params1.setMargins(0, 0, 20, myLocationFabMarginRight);
+        params1.setMargins(0, 0, 20, bottom);
     }
 }

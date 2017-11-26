@@ -36,15 +36,21 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
     @Override
     public void onBindViewHolder(RestaurantsViewHolder holder, int position) {
         holder.mTextView.setText(mItem.get(position).getName());
-        Picasso.with(mContext).load(mItem.get(position).getFirstimage2()).into(holder.mImageView);
+
+        Picasso.with(mContext)
+                .load(mItem.get(position).getFirstimage2())
+                .placeholder(R.mipmap.ic_launcher)
+                .into(holder.mImageView);
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         int color = generator.getRandomColor();
+
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
-                    .bold()
+                .bold()
                 .endConfig()
                 .buildRect("5", color);    // Color.parseColor("#4caf50")
+
         holder.ivRating.setImageDrawable(drawable);
     }
 
