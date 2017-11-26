@@ -63,6 +63,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
@@ -93,6 +94,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
         OnMapReadyCallback, ClusterManager.OnClusterItemClickListener<PlaceMarker>,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private final String TAG = "abcd";
 
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -134,15 +137,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i("Lifecycle", "onCreate()");
-
-        // savedInstanceState에서 위치와 카메라 위치를 가져온다.
-        if (savedInstanceState != null) {
-            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
-        }
+        Log.d(TAG, "onCreate()");
 
         setContentView(R.layout.activity_main);
 
@@ -246,11 +241,48 @@ public class MainActivity extends AppCompatActivity
      * 액티비티가 일시정지될 때 지도의 상태 저장
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onPause() {
+        super.onPause();
+
+        Log.d(TAG, "onPause()");
+
         if (mMap != null) {
-            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-            super.onSaveInstanceState(outState);
+            SharedPreferences mapStatePrefs = getSharedPreferences("mapStatePrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = mapStatePrefs.edit();
+
+            Gson gson = new Gson();
+
+            String cameraPosition = gson.toJson(mMap.getCameraPosition());
+            String lastKnownLocation = gson.toJson(mLastKnownLocation);
+
+            Log.d(TAG, cameraPosition.toString() + lastKnownLocation.toString());
+
+            editor.putString(KEY_CAMERA_POSITION, cameraPosition);
+            editor.putString(KEY_LOCATION, lastKnownLocation);
+
+            editor.apply();
+        }
+    }
+
+    /**
+     * 액티비티가 재개될 때 지도의 상태 복구
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "onResume()");
+
+        SharedPreferences mapStatePrefs = getSharedPreferences("mapStatePrefs", MODE_PRIVATE);
+
+        String cameraPosition = mapStatePrefs.getString(KEY_CAMERA_POSITION, null);
+        String lastKnownLocation = mapStatePrefs.getString(KEY_LOCATION, null);
+
+        if (cameraPosition != null && lastKnownLocation != null) {
+            Gson gson = new Gson();
+
+            mCameraPosition = gson.fromJson(cameraPosition, CameraPosition.class);
+            mLastKnownLocation = gson.fromJson(lastKnownLocation, Location.class);
         }
     }
 
@@ -273,7 +305,9 @@ public class MainActivity extends AppCompatActivity
 
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        if (mCameraPosition == null) {
+        if (mCameraPosition != null) {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+        } else {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
         }
 

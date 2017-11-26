@@ -1,5 +1,6 @@
 package kr.or.hanium.shareseoul.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,9 +53,13 @@ public class RestaurantsActivity extends AppCompatActivity {
                 .build();
         RestaurantsService restaurantsService = retrofit.create(RestaurantsService.class);
 
+        Intent intent = getIntent();
+        double latitude = intent.getDoubleExtra("latitude", 0);
+        double longitude = intent.getDoubleExtra("longitude", 0);
+
         Call<Restaurants> recommendationAPIResponseCall = restaurantsService.getRestaurants(
                 10, 1, 1, "AND", "shareseoul",
-                'A', 39, 126.96999996900558, 37.55999991985822,
+                'A', 39, longitude, latitude,
                 500, 'Y', "json");
         recommendationAPIResponseCall.enqueue(new Callback<Restaurants>() {
             @Override
