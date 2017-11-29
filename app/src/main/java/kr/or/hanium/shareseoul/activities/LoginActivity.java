@@ -78,8 +78,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         editor.putString("userEmail", email);
                         editor.apply();
 
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
+                        finish();
+                        Toast.makeText(LoginActivity.this, "로그인되었습니다.", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(LoginActivity.this, "이메일 또는 비밀번호를 다시 확인해주세요.", Toast.LENGTH_LONG).show();
                     }

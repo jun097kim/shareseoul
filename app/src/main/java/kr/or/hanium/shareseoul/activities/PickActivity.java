@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import kr.or.hanium.shareseoul.R;
@@ -24,13 +24,13 @@ public class PickActivity extends AppCompatActivity implements View.OnClickListe
 
         overridePendingTransition(0, 0);    // 전환 애니메이션 없애기
 
-        LinearLayout llBikes = findViewById(R.id.ll_bikes);
-        LinearLayout llRestaurants = findViewById(R.id.ll_restaurants);
-        LinearLayout llBathrooms = findViewById(R.id.ll_bathrooms);
+        ImageView ivBike = findViewById(R.id.iv_bike);
+        ImageView ivRestaurant = findViewById(R.id.iv_restaurant);
+        ImageView ivBathroom = findViewById(R.id.iv_bathroom);
 
-        llBikes.setOnClickListener(this);
-        llRestaurants.setOnClickListener(this);
-        llBathrooms.setOnClickListener(this);
+        ivBike.setOnClickListener(this);
+        ivRestaurant.setOnClickListener(this);
+        ivBathroom.setOnClickListener(this);
 
         backPressCloseHandler = new BackPressCloseHandler(this);
     }
@@ -39,13 +39,13 @@ public class PickActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         switch (view.getId()) {
-            case R.id.ll_bikes:
+            case R.id.iv_bike:
                 intent.putExtra("picked", "bikes");
                 break;
-            case R.id.ll_restaurants:
+            case R.id.iv_restaurant:
                 intent.putExtra("picked", "restaurants");
                 break;
-            case R.id.ll_bathrooms:
+            case R.id.iv_bathroom:
                 intent.putExtra("picked", "bathrooms");
         }
         startActivity(intent);

@@ -1,12 +1,13 @@
 <resources>
 
     <!-- 기본 테마 -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- 테마 커스텀 -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="titleTextColor">@color/colorAccent</item>
+
+        <item name="drawerArrowStyle">@style/DrawerArrowToggle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -19,7 +20,17 @@
         <item name="android:hint">검색</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Toolbar" parent="AppTheme">
+        <!-- Toolbar Title Color -->
+        <item name="android:textColorPrimary">@android:color/white</item>
+
+        <!-- Toolbar Up Button Color -->
+        <item name="android:textColorSecondary">#ccffffff</item>
+    </style>
+
+    <style name="DrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@android:color/white</item>
+    </style>
 </resources>

@@ -96,7 +96,7 @@ public class PlaceActivity extends AppCompatActivity implements OnMapReadyCallba
                 case "bikes":
                     text.append("따릉이 대여소");
 
-                    detailValues[0] = Integer.toString(intent.getIntExtra("placeId", 0));
+                    detailValues[0] = placeId;
                     detailValues[1] = Integer.toString(intent.getIntExtra("placeCount", 0));
 
                     break;

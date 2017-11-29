@@ -13,14 +13,14 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary">
+            android:layout_height="?attr/actionBarSize">
 
             <TextView
                 android:id="@+id/tv_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="따릉이 대여소 검색"
+                android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
         </android.support.v7.widget.Toolbar>
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@android:color/white"
         android:elevation="0dp"
         app:borderWidth="0dp"
         app:srcCompat="@drawable/ic_fab_my_location" />

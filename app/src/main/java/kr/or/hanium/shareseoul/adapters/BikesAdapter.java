@@ -30,7 +30,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
 
     @Override
     public BikesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bike, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_place, parent, false);
         BikesViewHolder bikesViewHolder = new BikesViewHolder(view);
         return bikesViewHolder;
     }
@@ -60,6 +60,7 @@ public class BikesAdapter extends RecyclerView.Adapter<BikesAdapter.BikesViewHol
             public void onClick(View view) {
                 Intent intent = new Intent(activity, PlaceActivity.class);
                 intent.putExtra("placeType", "bikes");
+                intent.putExtra("placeName", bikes.get(position).getName());
                 intent.putExtra("placeId", bikes.get(position).getId());
                 intent.putExtra("placeCount", bikes.get(position).getCount());
                 activity.startActivity(intent);

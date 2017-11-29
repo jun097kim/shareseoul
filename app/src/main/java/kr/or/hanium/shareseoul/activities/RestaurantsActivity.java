@@ -57,11 +57,11 @@ public class RestaurantsActivity extends AppCompatActivity {
         double latitude = intent.getDoubleExtra("latitude", 0);
         double longitude = intent.getDoubleExtra("longitude", 0);
 
-        Call<Restaurants> recommendationAPIResponseCall = restaurantsService.getRestaurants(
+        Call<Restaurants> restaurantsCall = restaurantsService.getRestaurants(
                 10, 1, 1, "AND", "shareseoul",
                 'A', 39, longitude, latitude,
-                500, 'Y', "json");
-        recommendationAPIResponseCall.enqueue(new Callback<Restaurants>() {
+                1000, 'Y', "json");
+        restaurantsCall.enqueue(new Callback<Restaurants>() {
             @Override
             public void onResponse(Call<Restaurants> call, Response<Restaurants> response) {
                 restaurantsItems = (ArrayList<Restaurants.Item>) response.body().getResponse().getBody().getItems().getItem();

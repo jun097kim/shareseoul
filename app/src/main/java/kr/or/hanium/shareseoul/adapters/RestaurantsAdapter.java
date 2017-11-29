@@ -39,7 +39,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsAdapter.
 
         Picasso.with(mContext)
                 .load(mItem.get(position).getFirstimage2())
-                .placeholder(R.mipmap.ic_launcher)
+                .placeholder(R.color.placeholder)
                 .into(holder.mImageView);
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT

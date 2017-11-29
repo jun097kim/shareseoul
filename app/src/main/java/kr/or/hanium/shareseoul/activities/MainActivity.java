@@ -190,15 +190,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // 로그인되어 있는지 확인
-        TextView tvEmail = headerView.findViewById(R.id.tv_email);
-        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        userEmail = pref.getString("userEmail", "");
-        if (!TextUtils.isEmpty(userEmail)) {
-            tvEmail.setText(userEmail);
-//            navLogin.setOnClickListener(null);
-        }
-
 
         Intent intent = getIntent();
         picked = intent.getStringExtra("picked");
@@ -283,6 +274,23 @@ public class MainActivity extends AppCompatActivity
 
             mCameraPosition = gson.fromJson(cameraPosition, CameraPosition.class);
             mLastKnownLocation = gson.fromJson(lastKnownLocation, Location.class);
+        }
+
+        // 로그인되어 있는지 확인
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView tvEmail = headerView.findViewById(R.id.tv_email);
+        RelativeLayout navLogin = headerView.findViewById(R.id.nav_login);
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        userEmail = pref.getString("userEmail", "");
+
+        if (!TextUtils.isEmpty(userEmail)) {
+            tvEmail.setText(userEmail);
+
+//            navLogin.setOnClickListener(null);
+//            navLogin.setClickable(false);
         }
     }
 
@@ -618,7 +626,11 @@ public class MainActivity extends AppCompatActivity
                     double latitude = place.getLatitude();
                     double longitude = place.getLongitude();
 
-                    placeMarkers.add(new PlaceMarker(id, new LatLng(latitude, longitude), name));
+                    if (place instanceof Bike) {
+                        placeMarkers.add(new PlaceMarker(id, new LatLng(latitude, longitude), name, ((Bike) place).getCount()));
+                    } else {
+                        placeMarkers.add(new PlaceMarker(id, new LatLng(latitude, longitude), name));
+                    }
                 }
 
                 LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
@@ -768,6 +780,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (picked.equals("bikes")) s = "Bikes";
                 else if (picked.equals("restaurants")) s = "Restaurants";
+                else if (picked.equals("bathrooms")) s = "Bathrooms";
 
                 intent.putExtra("picked", picked);
                 intent.putExtra("latitude", latitude);
@@ -797,6 +810,7 @@ public class MainActivity extends AppCompatActivity
         String address;
         String placeId;
         String placeName;
+        int placeCount;
 
         @Nullable
         @Override
@@ -832,7 +846,7 @@ public class MainActivity extends AppCompatActivity
             address = args.getString("address");
             placeId = args.getString("placeId");
             placeName = args.getString("name");
-
+            placeCount = args.getInt("placeCount");
 
             tvPlace.setText(placeName);
             tvAddress.setText(address);
@@ -845,9 +859,15 @@ public class MainActivity extends AppCompatActivity
             switch (view.getId()) {
                 case R.id.bottom_sheet:
                     Intent intent = new Intent(getActivity(), PlaceActivity.class);
+
                     intent.putExtra("placeType", placeType);
                     intent.putExtra("placeId", placeId);
                     intent.putExtra("placeName", placeName);
+
+                    if (placeType.equals("bikes")) {
+                        intent.putExtra("placeCount", placeCount);
+                    }
+
                     startActivity(intent);
                     break;
 
@@ -876,6 +896,10 @@ public class MainActivity extends AppCompatActivity
         args.putString("placeType", picked);
         args.putString("placeId", placeMarker.getId());
         args.putString("address", address);
+
+        if (picked.equals("bikes")) {
+            args.putInt("placeCount", placeMarker.getCount());
+        }
 
         placeFragment.setArguments(args);
 

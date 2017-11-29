@@ -19,75 +19,85 @@
         android:paddingTop="20dp">
 
         <LinearLayout
-            android:id="@+id/ll_bikes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:background="?android:attr/selectableItemBackground"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_bike"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_bikes" />
+                app:srcCompat="@drawable/ic_pick_bike" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="5dp"
-                android:text="따릉이" />
+                android:text="따릉이"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll_restaurants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:background="?android:attr/selectableItemBackground"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_restaurant"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_restaurants" />
+                app:srcCompat="@drawable/ic_pick_restaurant" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="5dp"
-                android:text="음식점" />
+                android:text="음식점"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
         </LinearLayout>
 
 
         <LinearLayout
-            android:id="@+id/ll_bathrooms"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:background="?android:attr/selectableItemBackground"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_bathroom"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_bathrooms" />
+                app:srcCompat="@drawable/ic_pick_bathroom" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="5dp"
-                android:text="화장실" />
+                android:text="화장실"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
         </LinearLayout>
     </RelativeLayout>
 

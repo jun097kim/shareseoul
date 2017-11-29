@@ -14,7 +14,6 @@
     <string name="title_activity_bikes">따릉이 대여소</string>
     <string name="title_activity_restaurants">음식점</string>
     <string name="title_activity_pick">쉐어서울</string>
-    <string name="title_activity_place">장소</string>
     <string name="title_activity_share">공유</string>
 
     <string-array name="bike_detail_names">

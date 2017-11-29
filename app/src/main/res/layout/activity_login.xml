@@ -16,17 +16,15 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorAccent">
+            android:layout_height="?attr/actionBarSize">
             <!-- ?attr: 현재 적용된 테마(AppTheme.NoActionBar)의 속성 -->
 
             <TextView
-                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/title_activity_login"
-                android:textColor="@color/colorPrimary" />
+                android:text="@string/title_activity_login" />
 
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
