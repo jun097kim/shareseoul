@@ -1,6 +1,5 @@
 package kr.or.hanium.shareseoul.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -64,9 +63,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 @Override
                 public void onResponse(Call<Register> call, Response<Register> response) {
                     if (response.body().getResult()) {
-                        Toast.makeText(RegisterActivity.this, "가입해주셔서 감사합니다.", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(intent);
+                        finish();
+                        Toast.makeText(getApplicationContext(), "가입해주셔서 감사합니다.", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(RegisterActivity.this, "이미 존재하는 이메일입니다.", Toast.LENGTH_LONG).show();
                     }

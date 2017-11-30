@@ -92,12 +92,4 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             });
         }
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // 로그인 성공시 액티비티 스택에서 지움(뒤로가기 막기)
-        finish();
-    }
 }
